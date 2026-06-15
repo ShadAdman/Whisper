@@ -1,0 +1,40 @@
+# Gradle files
+.gradle/
+build/
+**/build/
+
+# IntelliJ IDEA files
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Android files
+local.properties
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aar
+
+# Kotlin files
+kotlin-js-store/
+
+# iOS files
+*.swp
+*.lock
+.DS_Store
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Whisper specific
+/sample/build/
+/whisper/build/
+/whisper-core/build/
+/whisper-dsp/build/
+/whisper-audio/build/
