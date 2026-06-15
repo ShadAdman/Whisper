@@ -8,10 +8,8 @@ plugins {
 kotlin {
     applyDefaultHierarchyTemplate()
     androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "1.8"
-            }
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
         }
     }
     
@@ -22,11 +20,9 @@ kotlin {
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
-        iosTarget.binaries.executable {
+        iosTarget.binaries.framework {
             baseName = "ComposeApp"
-            mainRun {
-                setMain("com.whisper.sample.MainKt")
-            }
+            isStatic = true
         }
     }
 
