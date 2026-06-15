@@ -1,16 +1,16 @@
 package com.whisper.audio
 
 class AndroidAudioEngine : AudioEngine {
-    override val recorder: AudioRecorder = object : AudioRecorder {
-        override suspend fun start() { TODO("Not yet implemented") }
-        override suspend fun stop() { TODO("Not yet implemented") }
-    }
-    
-    override val player: AudioPlayer = object : AudioPlayer {
-        override suspend fun play(samples: FloatArray) { TODO("Not yet implemented") }
-        override suspend fun stop() { TODO("Not yet implemented") }
+    override val recorder: AudioRecorder = AndroidAudioRecorder()
+    override val player: AudioPlayer = AndroidAudioPlayer()
+
+    override suspend fun setup() {
+        // TODO: Request permissions, initialize engine
     }
 
-    override suspend fun setup() { TODO("Not yet implemented") }
-    override suspend fun release() { TODO("Not yet implemented") }
+    override suspend fun release() {
+        // TODO: Release resources
+    }
 }
+
+actual fun createAudioEngine(): AudioEngine = AndroidAudioEngine()
