@@ -7,3 +7,5 @@ interface AudioEngine {
     suspend fun setup()
     suspend fun release()
 }
+
+expect fun createAudioEngine(): AudioEngine
