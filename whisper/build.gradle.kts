@@ -23,6 +23,7 @@ kotlin {
             implementation(project(":whisper-core"))
             implementation(project(":whisper-dsp"))
             implementation(project(":whisper-audio"))
+            implementation(libs.kotlinx.coroutines.core)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
