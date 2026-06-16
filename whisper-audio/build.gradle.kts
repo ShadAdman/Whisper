@@ -21,6 +21,8 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":whisper-core"))
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.datetime)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -30,7 +32,7 @@ kotlin {
 
 android {
     namespace = "com.whisper.audio"
-    compileSdk = 34
+    compileSdk = 37
     defaultConfig {
         minSdk = 24
     }
