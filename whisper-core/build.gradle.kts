@@ -8,10 +8,8 @@ kotlin {
     
     androidLibrary {
         namespace = "com.whisper.core"
-        compileSdk = 34
+        compileSdk = 37
         minSdk = 24
-        
-        // No jvmTarget here, it's handled differently or defaults
     }
     
     jvm("desktop")

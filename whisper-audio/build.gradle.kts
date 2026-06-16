@@ -8,7 +8,7 @@ kotlin {
     
     androidLibrary {
         namespace = "com.whisper.audio"
-        compileSdk = 34
+        compileSdk = 37
         minSdk = 24
     }
     
