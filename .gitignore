@@ -39,3 +39,17 @@ kotlin-js-store/
 /whisper-core/build/
 /whisper-dsp/build/
 /whisper-audio/build/
+
+# Native prebuilts
+whisper-dsp/prebuilt/android/lib/*
+!whisper-dsp/prebuilt/android/lib/.gitkeep
+whisper-dsp/prebuilt/ios/lib/*
+!whisper-dsp/prebuilt/ios/lib/.gitkeep
+whisper-dsp/prebuilt/desktop/lib/*
+!whisper-dsp/prebuilt/desktop/lib/.gitkeep
+whisper-dsp/prebuilt/android/include/*
+!whisper-dsp/prebuilt/android/include/.gitkeep
+whisper-dsp/prebuilt/ios/include/*
+!whisper-dsp/prebuilt/ios/include/.gitkeep
+whisper-dsp/prebuilt/desktop/include/*
+!whisper-dsp/prebuilt/desktop/include/.gitkeep

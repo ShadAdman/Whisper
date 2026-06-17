@@ -101,7 +101,7 @@ jobs:
           cmake --build build_desktop --parallel
           
       - name: Prepare Artifacts (Unix)
-        if: runner.os != \u0027Windows\u0027
+        if: runner.os != 'Windows'
         shell: bash
         run: |
           mkdir -p whisper-dsp/prebuilt/desktop/lib
@@ -110,7 +110,7 @@ jobs:
           cp whisper-dsp/native/liquid-dsp/include/*.h whisper-dsp/prebuilt/desktop/include/liquid/
 
       - name: Prepare Artifacts (Windows)
-        if: runner.os == \u0027Windows\u0027
+        if: runner.os == 'Windows'
         shell: bash
         run: |
           mkdir -p whisper-dsp/prebuilt/desktop/lib
