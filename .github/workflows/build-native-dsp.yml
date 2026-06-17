@@ -15,10 +15,14 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Set up NDK
-        uses: nndk/setup-ndk@v1
-        with:
-          ndk-version: r26b
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install NDK
+        run: sdkmanager "ndk;26.1.10909125"
+
+      - name: Set NDK Path
+        run: echo "ANDROID_NDK_HOME=${ANDROID_SDK_ROOT}/ndk/26.1.10909125" >> $GITHUB_ENV
 
       - name: Build for Android (arm64-v8a)
         run: |
