@@ -36,9 +36,9 @@ jobs:
       - name: Prepare Artifacts
         run: |
           mkdir -p whisper-dsp/prebuilt/android/lib
-          mkdir -p whisper-dsp/prebuilt/android/include/liquid
+          mkdir -p whisper-dsp/prebuilt/android/include
           cp build_android/libliquid.so whisper-dsp/prebuilt/android/lib/
-          cp whisper-dsp/native/liquid-dsp/include/*.h whisper-dsp/prebuilt/android/include/liquid/
+          cp whisper-dsp/native/liquid-dsp/include/*.h whisper-dsp/prebuilt/android/include/
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
@@ -69,9 +69,9 @@ jobs:
       - name: Prepare Artifacts
         run: |
           mkdir -p whisper-dsp/prebuilt/ios/lib
-          mkdir -p whisper-dsp/prebuilt/ios/include/liquid
+          mkdir -p whisper-dsp/prebuilt/ios/include
           cp build_ios/libliquid.dylib whisper-dsp/prebuilt/ios/lib/
-          cp whisper-dsp/native/liquid-dsp/include/*.h whisper-dsp/prebuilt/ios/include/liquid/
+          cp whisper-dsp/native/liquid-dsp/include/*.h whisper-dsp/prebuilt/ios/include/
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
@@ -105,18 +105,18 @@ jobs:
         shell: bash
         run: |
           mkdir -p whisper-dsp/prebuilt/desktop/lib
-          mkdir -p whisper-dsp/prebuilt/desktop/include/liquid
+          mkdir -p whisper-dsp/prebuilt/desktop/include
           cp build_desktop/libliquid.* whisper-dsp/prebuilt/desktop/lib/
-          cp whisper-dsp/native/liquid-dsp/include/*.h whisper-dsp/prebuilt/desktop/include/liquid/
+          cp whisper-dsp/native/liquid-dsp/include/*.h whisper-dsp/prebuilt/desktop/include/
 
       - name: Prepare Artifacts (Windows)
         if: runner.os == 'Windows'
         shell: bash
         run: |
           mkdir -p whisper-dsp/prebuilt/desktop/lib
-          mkdir -p whisper-dsp/prebuilt/desktop/include/liquid
+          mkdir -p whisper-dsp/prebuilt/desktop/include
           cp build_desktop/Debug/liquid.dll whisper-dsp/prebuilt/desktop/lib/ || cp build_desktop/liquid.dll whisper-dsp/prebuilt/desktop/lib/
-          cp whisper-dsp/native/liquid-dsp/include/*.h whisper-dsp/prebuilt/desktop/include/liquid/
+          cp whisper-dsp/native/liquid-dsp/include/*.h whisper-dsp/prebuilt/desktop/include/
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
