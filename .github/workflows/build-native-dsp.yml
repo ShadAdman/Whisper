@@ -35,7 +35,8 @@ jobs:
             -DBUILD_SHARED_LIBS=ON \
             -DBUILD_EXAMPLES=OFF \
             -DBUILD_AUTOTESTS=OFF \
-            -DBUILD_BENCHMARKS=OFF
+            -DBUILD_BENCHMARKS=OFF \
+            -DFIND_FFTW=OFF
           cmake --build build_android --parallel $(nproc)
 
       - name: Prepare Artifacts
@@ -70,7 +71,8 @@ jobs:
             -DBUILD_AUTOTESTS=OFF \
             -DBUILD_BENCHMARKS=OFF \
             -DCXX_HAS_NEON_1_EXITCODE=0 \
-            -DCXX_HAS_NEON_1_EXITCODE__TRY_RUN_OUTPUT=""
+            -DCXX_HAS_NEON_1_EXITCODE__TRY_RUN_OUTPUT="" \
+            -DFIND_FFTW=OFF
           cmake --build build_ios --parallel $(sysctl -n hw.ncpu)
 
       - name: Prepare Artifacts
@@ -104,7 +106,8 @@ jobs:
             -DBUILD_SHARED_LIBS=ON \
             -DBUILD_EXAMPLES=OFF \
             -DBUILD_AUTOTESTS=OFF \
-            -DBUILD_BENCHMARKS=OFF
+            -DBUILD_BENCHMARKS=OFF \
+            -DFIND_FFTW=OFF
           cmake --build build_desktop --parallel
           
       - name: Prepare Artifacts (Unix)
