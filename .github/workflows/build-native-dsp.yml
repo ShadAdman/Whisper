@@ -72,8 +72,10 @@ jobs:
             -DBUILD_BENCHMARKS=OFF \
             -DCXX_HAS_NEON_1_EXITCODE=0 \
             -DCXX_HAS_NEON_1_EXITCODE__TRY_RUN_OUTPUT="" \
-            -DFIND_FFTW=OFF
-            -DENABLE_SIMD=OFF
+            -DC_HAS_NEON_1_EXITCODE=0 \
+            -DC_HAS_NEON_1_EXITCODE__TRY_RUN_OUTPUT="" \
+            -DFIND_FFTW=OFF \
+            -DENABLE_SIMD=OFF \
             -DFIND_SIMD=OFF
           cmake --build build_ios --parallel $(sysctl -n hw.ncpu)
 
