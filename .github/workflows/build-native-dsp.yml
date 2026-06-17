@@ -68,7 +68,9 @@ jobs:
             -DBUILD_SHARED_LIBS=ON \
             -DBUILD_EXAMPLES=OFF \
             -DBUILD_AUTOTESTS=OFF \
-            -DBUILD_BENCHMARKS=OFF
+            -DBUILD_BENCHMARKS=OFF \
+            -DCXX_HAS_NEON_1_EXITCODE=0 \
+            -DCXX_HAS_NEON_1_EXITCODE__TRY_RUN_OUTPUT=""
           cmake --build build_ios --parallel $(sysctl -n hw.ncpu)
 
       - name: Prepare Artifacts
