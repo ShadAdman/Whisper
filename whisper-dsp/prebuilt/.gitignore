@@ -1,0 +1,10 @@
+# Ignore all binaries in lib directories
+**/lib/*.so
+**/lib/*.dylib
+**/lib/*.dll
+**/lib/*.a
+**/lib/*.lib
+
+# Keep the directory structure
+!**/include/
+!**/lib/
