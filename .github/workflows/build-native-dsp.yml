@@ -2,7 +2,7 @@ name: Build Native DSP
 
 on:
   push:
-    branches: [ main, feature/** ]
+    branches: [ build-liquid-dsp ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
