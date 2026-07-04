@@ -39,6 +39,7 @@ jobs:
               -DANDROID_USE_LEGACY_TOOLCHAIN_FILE=OFF \
               -DANDROID_ABI=$abi \
               -DANDROID_PLATFORM=android-29 \
+              -DCMAKE_C_FLAGS="-Wno-error=implicit-function-declaration" \
               -DBUILD_SHARED_LIBS=ON \
               -DBUILD_EXAMPLES=OFF \
               -DBUILD_AUTOTESTS=OFF \
