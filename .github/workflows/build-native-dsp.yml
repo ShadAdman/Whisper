@@ -58,6 +58,9 @@ jobs:
           mkdir -p whisper-dsp/prebuilt/android/include
           cp whisper-dsp/native/liquid-dsp/include/*.h whisper-dsp/prebuilt/android/include/
 
+      - name: Force add artifacts
+        run: git add -f whisper-dsp/prebuilt/android
+
       - name: Commit and push
         uses: ./.github/actions/commit-and-push
         with:
