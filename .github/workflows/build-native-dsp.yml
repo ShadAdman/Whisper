@@ -38,7 +38,7 @@ jobs:
               -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake \
               -DANDROID_USE_LEGACY_TOOLCHAIN_FILE=OFF \
               -DANDROID_ABI=$abi \
-              -DANDROID_PLATFORM=android-24 \
+              -DANDROID_PLATFORM=android-29 \
               -DBUILD_SHARED_LIBS=ON \
               -DBUILD_EXAMPLES=OFF \
               -DBUILD_AUTOTESTS=OFF \

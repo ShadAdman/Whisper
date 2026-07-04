@@ -9,7 +9,7 @@ kotlin {
     androidLibrary {
         namespace = "com.whisper.dsp"
         compileSdk = 37
-        minSdk = 24
+        minSdk = 29
     }
     
     jvm("desktop")
