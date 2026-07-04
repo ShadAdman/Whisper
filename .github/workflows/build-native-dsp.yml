@@ -58,11 +58,11 @@ jobs:
           mkdir -p whisper-dsp/prebuilt/android/include
           cp whisper-dsp/native/liquid-dsp/include/*.h whisper-dsp/prebuilt/android/include/
 
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+      - name: Commit and push
+        uses: ./.github/actions/commit-and-push
         with:
-          name: liquid-dsp-android
-          path: whisper-dsp/prebuilt/android
+          message: Liquid-dsp for Android
+          add: whisper-dsp/prebuilt/android
 
 #  build-ios:
 #    runs-on: macos-latest
