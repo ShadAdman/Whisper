@@ -24,26 +24,35 @@ jobs:
       - name: Set NDK Path
         run: echo "ANDROID_NDK_HOME=${ANDROID_SDK_ROOT}/ndk/26.1.10909125" >> $GITHUB_ENV
 
-      - name: Build for Android (arm64-v8a)
+      - name: Bootstrap
         run: |
-          mkdir -p build_android
-          cmake -S whisper-dsp/native/liquid-dsp -B build_android \
-            -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake \
-            -DANDROID_USE_LEGACY_TOOLCHAIN_FILE=OFF \
-            -DANDROID_ABI=arm64-v8a \
-            -DANDROID_PLATFORM=android-24 \
-            -DBUILD_SHARED_LIBS=ON \
-            -DBUILD_EXAMPLES=OFF \
-            -DBUILD_AUTOTESTS=OFF \
-            -DBUILD_BENCHMARKS=OFF \
-            -DFIND_FFTW=OFF
-          cmake --build build_android --parallel $(nproc)
+          cd whisper-dsp/native/liquid-dsp
+          ./bootstrap.sh
 
-      - name: Prepare Artifacts
+      - name: Build for Android
         run: |
-          mkdir -p whisper-dsp/prebuilt/android/lib
+          for abi in arm64-v8a armeabi-v7a x86 x86_64; do
+            echo "Building for $abi..."
+            mkdir -p build_android_$abi
+            cmake -S whisper-dsp/native/liquid-dsp -B build_android_$abi \
+              -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake \
+              -DANDROID_USE_LEGACY_TOOLCHAIN_FILE=OFF \
+              -DANDROID_ABI=$abi \
+              -DANDROID_PLATFORM=android-24 \
+              -DBUILD_SHARED_LIBS=ON \
+              -DBUILD_EXAMPLES=OFF \
+              -DBUILD_AUTOTESTS=OFF \
+              -DBUILD_BENCHMARKS=OFF \
+              -DFIND_FFTW=OFF
+            cmake --build build_android_$abi --parallel $(nproc)
+            
+            mkdir -p whisper-dsp/prebuilt/android/lib/$abi
+            cp build_android_$abi/libliquid.so whisper-dsp/prebuilt/android/lib/$abi/
+          done
+
+      - name: Prepare Headers
+        run: |
           mkdir -p whisper-dsp/prebuilt/android/include
-          cp build_android/libliquid.so whisper-dsp/prebuilt/android/lib/
           cp whisper-dsp/native/liquid-dsp/include/*.h whisper-dsp/prebuilt/android/include/
 
       - name: Upload Artifacts
@@ -52,88 +61,88 @@ jobs:
           name: liquid-dsp-android
           path: whisper-dsp/prebuilt/android
 
-  build-ios:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Build for iOS (arm64)
-        run: |
-          mkdir -p build_ios
-          cmake -S whisper-dsp/native/liquid-dsp -B build_ios \
-            -DCMAKE_SYSTEM_NAME=iOS \
-            -DCMAKE_OSX_ARCHITECTURES=arm64 \
-            -DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 \
-            -DBUILD_SHARED_LIBS=ON \
-            -DBUILD_EXAMPLES=OFF \
-            -DBUILD_AUTOTESTS=OFF \
-            -DBUILD_BENCHMARKS=OFF \
-            -DCXX_HAS_NEON_1_EXITCODE=0 \
-            -DCXX_HAS_NEON_1_EXITCODE__TRY_RUN_OUTPUT="" \
-            -DC_HAS_NEON_1_EXITCODE=0 \
-            -DC_HAS_NEON_1_EXITCODE__TRY_RUN_OUTPUT="" \
-            -DFIND_FFTW=OFF \
-            -DENABLE_SIMD=OFF \
-            -DFIND_SIMD=OFF
-          cmake --build build_ios --parallel $(sysctl -n hw.ncpu)
-
-      - name: Prepare Artifacts
-        run: |
-          mkdir -p whisper-dsp/prebuilt/ios/lib
-          mkdir -p whisper-dsp/prebuilt/ios/include
-          cp build_ios/libliquid.dylib whisper-dsp/prebuilt/ios/lib/
-          cp whisper-dsp/native/liquid-dsp/include/*.h whisper-dsp/prebuilt/ios/include/
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: liquid-dsp-ios
-          path: whisper-dsp/prebuilt/ios
-
-  build-desktop:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Build for Desktop
-        shell: bash
-        run: |
-          mkdir -p build_desktop
-          cmake -S whisper-dsp/native/liquid-dsp -B build_desktop \
-            -DBUILD_SHARED_LIBS=ON \
-            -DBUILD_EXAMPLES=OFF \
-            -DBUILD_AUTOTESTS=OFF \
-            -DBUILD_BENCHMARKS=OFF \
-            -DFIND_FFTW=OFF
-          cmake --build build_desktop --parallel
-          
-      - name: Prepare Artifacts (Unix)
-        if: runner.os != 'Windows'
-        shell: bash
-        run: |
-          mkdir -p whisper-dsp/prebuilt/desktop/lib
-          mkdir -p whisper-dsp/prebuilt/desktop/include
-          cp build_desktop/libliquid.* whisper-dsp/prebuilt/desktop/lib/
-          cp whisper-dsp/native/liquid-dsp/include/*.h whisper-dsp/prebuilt/desktop/include/
-
-      - name: Prepare Artifacts (Windows)
-        if: runner.os == 'Windows'
-        shell: bash
-        run: |
-          mkdir -p whisper-dsp/prebuilt/desktop/lib
-          mkdir -p whisper-dsp/prebuilt/desktop/include
-          cp build_desktop/Debug/liquid.dll whisper-dsp/prebuilt/desktop/lib/ || cp build_desktop/liquid.dll whisper-dsp/prebuilt/desktop/lib/
-          cp whisper-dsp/native/liquid-dsp/include/*.h whisper-dsp/prebuilt/desktop/include/
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: liquid-dsp-desktop-${{ matrix.os }}
-          path: whisper-dsp/prebuilt/desktop
+#  build-ios:
+#    runs-on: macos-latest
+#    steps:
+#      - uses: actions/checkout@v4
+#        with:
+#          submodules: recursive
+#
+#      - name: Build for iOS (arm64)
+#        run: |
+#          mkdir -p build_ios
+#          cmake -S whisper-dsp/native/liquid-dsp -B build_ios \
+#            -DCMAKE_SYSTEM_NAME=iOS \
+#            -DCMAKE_OSX_ARCHITECTURES=arm64 \
+#            -DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 \
+#            -DBUILD_SHARED_LIBS=ON \
+#            -DBUILD_EXAMPLES=OFF \
+#            -DBUILD_AUTOTESTS=OFF \
+#            -DBUILD_BENCHMARKS=OFF \
+#            -DCXX_HAS_NEON_1_EXITCODE=0 \
+#            -DCXX_HAS_NEON_1_EXITCODE__TRY_RUN_OUTPUT="" \
+#            -DC_HAS_NEON_1_EXITCODE=0 \
+#            -DC_HAS_NEON_1_EXITCODE__TRY_RUN_OUTPUT="" \
+#            -DFIND_FFTW=OFF \
+#            -DENABLE_SIMD=OFF \
+#            -DFIND_SIMD=OFF
+#          cmake --build build_ios --parallel $(sysctl -n hw.ncpu)
+#
+#      - name: Prepare Artifacts
+#        run: |
+#          mkdir -p whisper-dsp/prebuilt/ios/lib
+#          mkdir -p whisper-dsp/prebuilt/ios/include
+#          cp build_ios/libliquid.dylib whisper-dsp/prebuilt/ios/lib/
+#          cp whisper-dsp/native/liquid-dsp/include/*.h whisper-dsp/prebuilt/ios/include/
+#
+#      - name: Upload Artifacts
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: liquid-dsp-ios
+#          path: whisper-dsp/prebuilt/ios
+#
+#  build-desktop:
+#    strategy:
+#      matrix:
+#        os: [ubuntu-latest, macos-latest, windows-latest]
+#    runs-on: ${{ matrix.os }}
+#    steps:
+#      - uses: actions/checkout@v4
+#        with:
+#          submodules: recursive
+#
+#      - name: Build for Desktop
+#        shell: bash
+#        run: |
+#          mkdir -p build_desktop
+#          cmake -S whisper-dsp/native/liquid-dsp -B build_desktop \
+#            -DBUILD_SHARED_LIBS=ON \
+#            -DBUILD_EXAMPLES=OFF \
+#            -DBUILD_AUTOTESTS=OFF \
+#            -DBUILD_BENCHMARKS=OFF \
+#            -DFIND_FFTW=OFF
+#          cmake --build build_desktop --parallel
+#
+#      - name: Prepare Artifacts (Unix)
+#        if: runner.os != 'Windows'
+#        shell: bash
+#        run: |
+#          mkdir -p whisper-dsp/prebuilt/desktop/lib
+#          mkdir -p whisper-dsp/prebuilt/desktop/include
+#          cp build_desktop/libliquid.* whisper-dsp/prebuilt/desktop/lib/
+#          cp whisper-dsp/native/liquid-dsp/include/*.h whisper-dsp/prebuilt/desktop/include/
+#
+#      - name: Prepare Artifacts (Windows)
+#        if: runner.os == 'Windows'
+#        shell: bash
+#        run: |
+#          mkdir -p whisper-dsp/prebuilt/desktop/lib
+#          mkdir -p whisper-dsp/prebuilt/desktop/include
+#          cp build_desktop/Debug/liquid.dll whisper-dsp/prebuilt/desktop/lib/ || cp build_desktop/liquid.dll whisper-dsp/prebuilt/desktop/lib/
+#          cp whisper-dsp/native/liquid-dsp/include/*.h whisper-dsp/prebuilt/desktop/include/
+#
+#      - name: Upload Artifacts
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: liquid-dsp-desktop-${{ matrix.os }}
+#          path: whisper-dsp/prebuilt/desktop
