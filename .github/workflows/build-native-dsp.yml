@@ -124,12 +124,12 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Bootstrap
-        if: runner.os != 'Windows'
-        shell: bash
-        run: |
-          cd whisper-dsp/native/liquid-dsp
-          ./bootstrap.sh
+#      - name: Bootstrap
+#        if: runner.os != 'Windows'
+#        shell: bash
+#        run: |
+#          cd whisper-dsp/native/liquid-dsp
+#          ./bootstrap.sh
 
       - name: Build for Desktop
         shell: bash
