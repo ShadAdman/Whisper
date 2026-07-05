@@ -124,13 +124,6 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Bootstrap
-        if: matrix.os != 'windows-latest'
-        shell: bash
-        run: |
-          cd whisper-dsp/native/liquid-dsp
-          ./bootstrap.sh
-
       - name: Build for Desktop
         shell: bash
         run: |
