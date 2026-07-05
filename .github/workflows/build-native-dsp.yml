@@ -77,10 +77,10 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Bootstrap
-        run: |
-          cd whisper-dsp/native/liquid-dsp
-          ./bootstrap.sh    
+#      - name: Bootstrap
+#        run: |
+#          cd whisper-dsp/native/liquid-dsp
+#          ./bootstrap.sh
 
       - name: Build for iOS (arm64)
         run: |
