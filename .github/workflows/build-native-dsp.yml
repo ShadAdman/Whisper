@@ -130,13 +130,13 @@ jobs:
           mkdir -p build_desktop
           if [ "${{ matrix.os }}" == "windows-latest" ]; then
             cmake -S whisper-dsp/native/liquid-dsp -B build_desktop \
+              -T ClangCL \
               -DBUILD_SHARED_LIBS=ON \
               -DBUILD_EXAMPLES=OFF \
               -DBUILD_AUTOTESTS=OFF \
               -DBUILD_BENCHMARKS=OFF \
               -DENABLE_SIMD=OFF \
-              -DFIND_FFTW=OFF \
-              -DCMAKE_C_FLAGS="/Zc:preprocessor /Drestrict=__restrict"
+              -DFIND_FFTW=OFF
           else
             cmake -S whisper-dsp/native/liquid-dsp -B build_desktop \
               -DBUILD_SHARED_LIBS=ON \
