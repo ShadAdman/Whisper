@@ -124,24 +124,35 @@ jobs:
         with:
           submodules: recursive
 
-#      - name: Bootstrap
-#        if: runner.os != 'Windows'
-#        shell: bash
-#        run: |
-#          cd whisper-dsp/native/liquid-dsp
-#          ./bootstrap.sh
+      - name: Bootstrap
+        if: matrix.os != 'windows-latest'
+        shell: bash
+        run: |
+          cd whisper-dsp/native/liquid-dsp
+          ./bootstrap.sh
 
       - name: Build for Desktop
         shell: bash
         run: |
           mkdir -p build_desktop
-          cmake -S whisper-dsp/native/liquid-dsp -B build_desktop \
-            -DBUILD_SHARED_LIBS=ON \
-            -DBUILD_EXAMPLES=OFF \
-            -DBUILD_AUTOTESTS=OFF \
-            -DBUILD_BENCHMARKS=OFF \
-            -DENABLE_SIMD=OFF \
-            -DFIND_FFTW=OFF
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            cmake -S whisper-dsp/native/liquid-dsp -B build_desktop \
+              -DBUILD_SHARED_LIBS=ON \
+              -DBUILD_EXAMPLES=OFF \
+              -DBUILD_AUTOTESTS=OFF \
+              -DBUILD_BENCHMARKS=OFF \
+              -DENABLE_SIMD=OFF \
+              -DFIND_FFTW=OFF \
+              -DCMAKE_C_FLAGS="/Zc:preprocessor /Drestrict=__restrict"
+          else
+            cmake -S whisper-dsp/native/liquid-dsp -B build_desktop \
+              -DBUILD_SHARED_LIBS=ON \
+              -DBUILD_EXAMPLES=OFF \
+              -DBUILD_AUTOTESTS=OFF \
+              -DBUILD_BENCHMARKS=OFF \
+              -DENABLE_SIMD=OFF \
+              -DFIND_FFTW=OFF
+          fi
           cmake --build build_desktop --parallel
 
       - name: Prepare Artifacts (Linux)
