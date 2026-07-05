@@ -1,0 +1,6 @@
+package = liquid
+headers = liquid.h
+headerFilter = *
+
+compilerOpts = -Iprebuilt/desktop/linux/include
+linkerOpts = -Lprebuilt/desktop/linux/lib -lliquid
