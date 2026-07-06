@@ -2,19 +2,28 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidKotlinMultiplatform)
+    alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kmmbridge)
     `maven-publish`
+}
+
+android {
+    namespace = "com.whisper.dsp"
+    compileSdk = 37
+    defaultConfig {
+        minSdk = 29
+    }
+    externalNativeBuild {
+        cmake {
+            path = file("src/androidMain/cpp/CMakeLists.txt")
+        }
+    }
 }
 
 kotlin {
     applyDefaultHierarchyTemplate()
     
-    androidLibrary {
-        namespace = "com.whisper.dsp"
-        compileSdk = 34
-        minSdk = 29
-    }
+    androidTarget()
     
     jvm("desktop")
 
