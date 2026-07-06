@@ -5,42 +5,67 @@ import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 class AndroidAudioRecorder : AudioRecorder {
-    private var listener: ((FloatArray) -> Unit)? = null
+    private val _samples = MutableSharedFlow<FloatArray>(
+        extraBufferCapacity = 64,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    override val samples: Flow<FloatArray> = _samples
+    
     private var audioRecord: AudioRecord? = null
     private var recordingJob: Job? = null
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     private val sampleRate = 48000
     private val channelConfig = AudioFormat.CHANNEL_IN_MONO
-    private val audioFormat = AudioFormat.ENCODING_PCM_FLOAT
-    private val bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat)
-
-    override fun setListener(listener: (FloatArray) -> Unit) {
-        this.listener = listener
-    }
+    private val audioFormat = AudioFormat.ENCODING_PCM_16BIT
 
     @SuppressLint("MissingPermission")
     override suspend fun start() {
         if (audioRecord != null) return
 
-        audioRecord = AudioRecord(
-            MediaRecorder.AudioSource.MIC,
-            sampleRate,
-            channelConfig,
-            audioFormat,
-            bufferSize
-        )
+        val minBufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat)
+        if (minBufferSize <= 0) {
+            println("Error: Invalid minBufferSize $minBufferSize")
+            return
+        }
+        
+        val actualBufferSize = maxOf(minBufferSize, 1024 * 2)
+
+        audioRecord = AudioRecord.Builder()
+            .setAudioSource(MediaRecorder.AudioSource.MIC)
+            .setAudioFormat(
+                AudioFormat.Builder()
+                    .setEncoding(audioFormat)
+                    .setSampleRate(sampleRate)
+                    .setChannelMask(channelConfig)
+                    .build()
+            )
+            .setBufferSizeInBytes(actualBufferSize)
+            .build()
+
+        if (audioRecord?.state != AudioRecord.STATE_INITIALIZED) {
+            println("Error: AudioRecord initialization failed")
+            audioRecord = null
+            return
+        }
 
         audioRecord?.startRecording()
 
         recordingJob = scope.launch {
-            val buffer = FloatArray(bufferSize / 4) // Float is 4 bytes
+            val shortBuffer = ShortArray(2048)
+            val floatBuffer = FloatArray(2048)
             while (isActive && audioRecord?.recordingState == AudioRecord.RECORDSTATE_RECORDING) {
-                val read = audioRecord?.read(buffer, 0, buffer.size, AudioRecord.READ_BLOCKING) ?: -1
+                val read = audioRecord?.read(shortBuffer, 0, shortBuffer.size) ?: -1
                 if (read > 0) {
-                    listener?.invoke(buffer.copyOf(read))
+                    for (i in 0 until read) {
+                        floatBuffer[i] = shortBuffer[i] / 32768f
+                    }
+                    _samples.emit(floatBuffer.copyOf(read))
                 }
             }
         }

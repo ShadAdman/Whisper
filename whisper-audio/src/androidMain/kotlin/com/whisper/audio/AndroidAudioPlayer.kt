@@ -10,36 +10,51 @@ class AndroidAudioPlayer : AudioPlayer {
     private var audioTrack: AudioTrack? = null
     private val sampleRate = 48000
 
-    override suspend fun play(samples: FloatArray) = withContext(Dispatchers.IO) {
-        stop()
+    override suspend fun play(samples: FloatArray) {
+        withContext(Dispatchers.IO) {
+            stop()
 
-        val bufferSize = AudioTrack.getMinBufferSize(
-            sampleRate,
-            AudioFormat.CHANNEL_OUT_MONO,
-            AudioFormat.ENCODING_PCM_FLOAT
-        )
-
-        audioTrack = AudioTrack.Builder()
-            .setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .build()
+            val audioFormat = AudioFormat.ENCODING_PCM_16BIT
+            val minBufferSize = AudioTrack.getMinBufferSize(
+                sampleRate,
+                AudioFormat.CHANNEL_OUT_MONO,
+                audioFormat
             )
-            .setAudioFormat(
-                AudioFormat.Builder()
-                    .setEncoding(AudioFormat.ENCODING_PCM_FLOAT)
-                    .setSampleRate(sampleRate)
-                    .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
-                    .build()
-            )
-            .setBufferSizeInBytes(maxOf(bufferSize, samples.size * 4))
-            .setTransferMode(AudioTrack.MODE_STATIC)
-            .build()
+            
+            val actualBufferSize = maxOf(minBufferSize, samples.size * 2)
 
-        audioTrack?.let { track ->
-            track.write(samples, 0, samples.size, AudioTrack.WRITE_BLOCKING)
-            track.play()
+            audioTrack = AudioTrack.Builder()
+                .setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .build()
+                )
+                .setAudioFormat(
+                    AudioFormat.Builder()
+                        .setEncoding(audioFormat)
+                        .setSampleRate(sampleRate)
+                        .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+                        .build()
+                )
+                .setBufferSizeInBytes(actualBufferSize)
+                .setTransferMode(AudioTrack.MODE_STREAM)
+                .build()
+
+            if (audioTrack?.state != AudioTrack.STATE_INITIALIZED) {
+                println("Error: AudioTrack initialization failed")
+                audioTrack = null
+                return@withContext
+            }
+
+            audioTrack?.let { track ->
+                val shortSamples = ShortArray(samples.size)
+                for (i in samples.indices) {
+                    shortSamples[i] = (samples[i] * 32767).toInt().toShort()
+                }
+                track.play()
+                track.write(shortSamples, 0, shortSamples.size, AudioTrack.WRITE_BLOCKING)
+            }
         }
     }
 

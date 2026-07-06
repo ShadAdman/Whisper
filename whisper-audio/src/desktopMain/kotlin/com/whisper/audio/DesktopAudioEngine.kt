@@ -14,3 +14,7 @@ class DesktopAudioEngine : AudioEngine {
 }
 
 actual fun createAudioEngine(): AudioEngine = DesktopAudioEngine()
+
+actual fun createAudioPlayer(): AudioPlayer = DesktopAudioPlayer()
+
+actual fun createAudioRecorder(): AudioRecorder = DesktopAudioRecorder()

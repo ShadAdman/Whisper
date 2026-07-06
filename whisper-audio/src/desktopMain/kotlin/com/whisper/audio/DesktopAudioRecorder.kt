@@ -1,19 +1,19 @@
 package com.whisper.audio
 
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import javax.sound.sampled.*
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 class DesktopAudioRecorder : AudioRecorder {
-    private var listener: ((FloatArray) -> Unit)? = null
+    private val _samples = MutableSharedFlow<FloatArray>()
+    override val samples: Flow<FloatArray> = _samples
+    
     private var line: TargetDataLine? = null
     private var recordingJob: Job? = null
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-
-    override fun setListener(listener: (FloatArray) -> Unit) {
-        this.listener = listener
-    }
 
     override suspend fun start() {
         if (line != null) return
@@ -30,7 +30,7 @@ class DesktopAudioRecorder : AudioRecorder {
         line?.start()
 
         recordingJob = scope.launch {
-            val buffer = ByteArray(1024)
+            val buffer = ByteArray(2048)
             while (isActive && line?.isOpen == true) {
                 val read = line?.read(buffer, 0, buffer.size) ?: -1
                 if (read > 0) {
@@ -39,7 +39,7 @@ class DesktopAudioRecorder : AudioRecorder {
                     for (i in floats.indices) {
                         floats[i] = bb.short.toFloat() / Short.MAX_VALUE
                     }
-                    listener?.invoke(floats)
+                    _samples.emit(floats)
                 }
             }
         }

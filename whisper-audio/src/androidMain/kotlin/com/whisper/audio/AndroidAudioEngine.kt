@@ -14,3 +14,7 @@ class AndroidAudioEngine : AudioEngine {
 }
 
 actual fun createAudioEngine(): AudioEngine = AndroidAudioEngine()
+
+actual fun createAudioPlayer(): AudioPlayer = AndroidAudioPlayer()
+
+actual fun createAudioRecorder(): AudioRecorder = AndroidAudioRecorder()

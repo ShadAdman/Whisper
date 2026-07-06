@@ -1,7 +1,11 @@
 package com.whisper.audio
 
+import kotlinx.coroutines.flow.Flow
+
 interface AudioRecorder {
-    fun setListener(listener: (FloatArray) -> Unit)
+    val samples: Flow<FloatArray>
     suspend fun start()
     suspend fun stop()
 }
+
+expect fun createAudioRecorder(): AudioRecorder
