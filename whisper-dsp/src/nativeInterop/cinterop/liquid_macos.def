@@ -1,0 +1,6 @@
+package = liquid
+headers = liquid.h
+headerFilter = *
+
+compilerOpts = -Iprebuilt/desktop/macos/include
+linkerOpts = -Lprebuilt/desktop/macos/lib -lliquid

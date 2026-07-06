@@ -1,0 +1,6 @@
+package = liquid
+headers = liquid.h
+headerFilter = *
+
+compilerOpts = -Iprebuilt/ios/include
+linkerOpts = -Lprebuilt/ios/lib -lliquid

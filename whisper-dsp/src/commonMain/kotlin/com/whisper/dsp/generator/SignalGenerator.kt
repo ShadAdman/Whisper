@@ -6,3 +6,5 @@ interface SignalGenerator {
         durationMs: Int
     ): FloatArray
 }
+
+expect fun createSignalGenerator(): SignalGenerator
