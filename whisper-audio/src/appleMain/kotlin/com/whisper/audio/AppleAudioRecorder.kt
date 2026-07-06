@@ -1,5 +1,6 @@
 package com.whisper.audio
 
+import com.whisper.core.model.AudioFrame
 import kotlinx.cinterop.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -9,8 +10,8 @@ import platform.Foundation.*
 
 @OptIn(ExperimentalForeignApi::class)
 class AppleAudioRecorder : AudioRecorder {
-    private val _samples = MutableSharedFlow<FloatArray>()
-    override val samples: Flow<FloatArray> = _samples
+    private val _samples = MutableSharedFlow<AudioFrame>()
+    override val samples: Flow<AudioFrame> = _samples
     
     private val audioEngine = AVAudioEngine()
 
@@ -27,7 +28,14 @@ class AppleAudioRecorder : AudioRecorder {
                 for (i in 0 until frameCount) {
                     samples[i] = floatData[i]
                 }
-                _samples.tryEmit(samples)
+                _samples.tryEmit(
+                    AudioFrame(
+                        samples = samples,
+                        sampleRate = format.sampleRate.toInt(),
+                        channels = format.channelCount.toInt(),
+                        timestamp = NSDate().timeIntervalSince1970.toLong() * 1000
+                    )
+                )
             }
         }
 

@@ -4,17 +4,18 @@ import android.annotation.SuppressLint
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
+import com.whisper.core.model.AudioFrame
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 class AndroidAudioRecorder : AudioRecorder {
-    private val _samples = MutableSharedFlow<FloatArray>(
+    private val _samples = MutableSharedFlow<AudioFrame>(
         extraBufferCapacity = 64,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
-    override val samples: Flow<FloatArray> = _samples
+    override val samples: Flow<AudioFrame> = _samples
     
     private var audioRecord: AudioRecord? = null
     private var recordingJob: Job? = null
@@ -65,7 +66,14 @@ class AndroidAudioRecorder : AudioRecorder {
                     for (i in 0 until read) {
                         floatBuffer[i] = shortBuffer[i] / 32768f
                     }
-                    _samples.emit(floatBuffer.copyOf(read))
+                    _samples.emit(
+                        AudioFrame(
+                            samples = floatBuffer.copyOf(read),
+                            sampleRate = sampleRate,
+                            channels = 1,
+                            timestamp = System.currentTimeMillis()
+                        )
+                    )
                 }
             }
         }

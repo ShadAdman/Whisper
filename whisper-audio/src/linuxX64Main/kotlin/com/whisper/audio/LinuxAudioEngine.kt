@@ -1,16 +1,17 @@
 package com.whisper.audio
 
+import com.whisper.core.model.AudioFrame
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 
 class LinuxAudioEngine : AudioEngine {
     override val recorder: AudioRecorder = object : AudioRecorder {
-        override val samples: Flow<FloatArray> = emptyFlow()
+        override val samples: Flow<AudioFrame> = emptyFlow()
         override suspend fun start() {}
         override suspend fun stop() {}
     }
     override val player: AudioPlayer = object : AudioPlayer {
-        override suspend fun play(samples: FloatArray) {}
+        override suspend fun play(frame: AudioFrame) {}
         override suspend fun stop() {}
     }
 

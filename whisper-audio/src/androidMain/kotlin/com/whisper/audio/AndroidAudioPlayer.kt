@@ -3,25 +3,25 @@ package com.whisper.audio
 import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioTrack
+import com.whisper.core.model.AudioFrame
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class AndroidAudioPlayer : AudioPlayer {
     private var audioTrack: AudioTrack? = null
-    private val sampleRate = 48000
 
-    override suspend fun play(samples: FloatArray) {
+    override suspend fun play(frame: AudioFrame) {
         withContext(Dispatchers.IO) {
             stop()
 
             val audioFormat = AudioFormat.ENCODING_PCM_16BIT
             val minBufferSize = AudioTrack.getMinBufferSize(
-                sampleRate,
+                frame.sampleRate,
                 AudioFormat.CHANNEL_OUT_MONO,
                 audioFormat
             )
             
-            val actualBufferSize = maxOf(minBufferSize, samples.size * 2)
+            val actualBufferSize = maxOf(minBufferSize, frame.samples.size * 2)
 
             audioTrack = AudioTrack.Builder()
                 .setAudioAttributes(
@@ -33,7 +33,7 @@ class AndroidAudioPlayer : AudioPlayer {
                 .setAudioFormat(
                     AudioFormat.Builder()
                         .setEncoding(audioFormat)
-                        .setSampleRate(sampleRate)
+                        .setSampleRate(frame.sampleRate)
                         .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
                         .build()
                 )
@@ -48,9 +48,9 @@ class AndroidAudioPlayer : AudioPlayer {
             }
 
             audioTrack?.let { track ->
-                val shortSamples = ShortArray(samples.size)
-                for (i in samples.indices) {
-                    shortSamples[i] = (samples[i] * 32767).toInt().toShort()
+                val shortSamples = ShortArray(frame.samples.size)
+                for (i in frame.samples.indices) {
+                    shortSamples[i] = (frame.samples[i] * 32767).toInt().toShort()
                 }
                 track.play()
                 track.write(shortSamples, 0, shortSamples.size, AudioTrack.WRITE_BLOCKING)

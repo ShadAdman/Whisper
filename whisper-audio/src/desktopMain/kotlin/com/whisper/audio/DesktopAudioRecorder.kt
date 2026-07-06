@@ -1,5 +1,6 @@
 package com.whisper.audio
 
+import com.whisper.core.model.AudioFrame
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -8,8 +9,8 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 class DesktopAudioRecorder : AudioRecorder {
-    private val _samples = MutableSharedFlow<FloatArray>()
-    override val samples: Flow<FloatArray> = _samples
+    private val _samples = MutableSharedFlow<AudioFrame>()
+    override val samples: Flow<AudioFrame> = _samples
     
     private var line: TargetDataLine? = null
     private var recordingJob: Job? = null
@@ -39,7 +40,14 @@ class DesktopAudioRecorder : AudioRecorder {
                     for (i in floats.indices) {
                         floats[i] = bb.short.toFloat() / Short.MAX_VALUE
                     }
-                    _samples.emit(floats)
+                    _samples.emit(
+                        AudioFrame(
+                            samples = floats,
+                            sampleRate = format.sampleRate.toInt(),
+                            channels = format.channels,
+                            timestamp = System.currentTimeMillis()
+                        )
+                    )
                 }
             }
         }
