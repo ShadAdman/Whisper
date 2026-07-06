@@ -1,6 +1,6 @@
 package = liquid
 headers = liquid.h
-headerFilter = *
+headerFilter = liquid.h
 
-compilerOpts = -Iprebuilt/ios/include
-linkerOpts = -Lprebuilt/ios/lib -lliquid
+compilerOpts = -Iwhisper-dsp/prebuilt/ios/include
+linkerOpts = -Lwhisper-dsp/prebuilt/ios/lib -lliquid

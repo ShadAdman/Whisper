@@ -1,16 +1,25 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidKotlinMultiplatform)
+    alias(libs.plugins.androidLibrary)
+}
+
+android {
+    namespace = "com.whisper.core"
+    compileSdk = 34
+    defaultConfig {
+        minSdk = 29
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
 }
 
 kotlin {
+    jvmToolchain(17)
     applyDefaultHierarchyTemplate()
     
-    androidLibrary {
-        namespace = "com.whisper.core"
-        compileSdk = 34
-        minSdk = 24
-    }
+    androidTarget()
     
     jvm("desktop")
 

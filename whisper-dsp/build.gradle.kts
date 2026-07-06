@@ -9,9 +9,13 @@ plugins {
 
 android {
     namespace = "com.whisper.dsp"
-    compileSdk = 37
+    compileSdk = 34
     defaultConfig {
         minSdk = 29
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     externalNativeBuild {
         cmake {
@@ -21,6 +25,7 @@ android {
 }
 
 kotlin {
+    jvmToolchain(17)
     applyDefaultHierarchyTemplate()
     
     androidTarget()
@@ -99,7 +104,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(project(":whisper-core"))
+                api(project(":whisper-core"))
                 implementation(libs.kotlinx.coroutines.core)
             }
         }

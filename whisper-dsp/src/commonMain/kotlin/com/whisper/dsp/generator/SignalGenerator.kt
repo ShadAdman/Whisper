@@ -5,6 +5,10 @@ interface SignalGenerator {
         frequency: Float,
         durationMs: Int
     ): FloatArray
+
+    companion object {
+        fun create(): SignalGenerator = KotlinSignalGenerator()
+    }
 }
 
 expect fun createSignalGenerator(): SignalGenerator
