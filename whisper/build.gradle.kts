@@ -4,12 +4,13 @@ plugins {
 }
 
 kotlin {
+    jvmToolchain(17)
     applyDefaultHierarchyTemplate()
     
     androidLibrary {
         namespace = "com.whisper"
         compileSdk = 34
-        minSdk = 24
+        minSdk = 29
     }
     
     jvm("desktop")
@@ -26,7 +27,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(project(":whisper-core"))
+            api(project(":whisper-core"))
             implementation(project(":whisper-dsp"))
             implementation(project(":whisper-audio"))
             implementation(libs.kotlinx.coroutines.core)
