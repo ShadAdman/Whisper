@@ -13,6 +13,7 @@ set_target_properties(liquid PROPERTIES IMPORTED_LOCATION
 add_library(whisper_dsp_jni SHARED
     signal_generator.cpp
     fft_processor.cpp
+    bandpass_filter.cpp
 )
 
 target_include_directories(whisper_dsp_jni PRIVATE

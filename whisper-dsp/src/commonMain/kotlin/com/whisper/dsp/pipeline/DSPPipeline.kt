@@ -12,4 +12,10 @@ class DSPPipeline(
         }
         return currentFrame
     }
+
+    fun release() {
+        for (stage in stages) {
+            stage.release()
+        }
+    }
 }
