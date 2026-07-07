@@ -7,10 +7,12 @@ import com.whisper.core.model.AudioFrame
 import com.whisper.core.model.CarrierEvent
 import com.whisper.core.model.FrequencyDetection
 import com.whisper.dsp.detector.CarrierDetector
+import com.whisper.dsp.detector.PeakDetectorConfig
 import com.whisper.dsp.detector.PeakDetectorStage
 import com.whisper.dsp.fft.createFFTProcessor
 import com.whisper.dsp.generator.SignalGenerator
 import com.whisper.dsp.generator.createSignalGenerator
+import com.whisper.dsp.modem.*
 import com.whisper.dsp.pipeline.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
@@ -28,6 +30,65 @@ object Whisper {
             GainStage()
         )
     )
+
+    val decodedBits: Flow<Int> = flow {
+        val currentEngine = getOrInitializeEngine()
+        val processor = createFFTProcessor(2048)
+        val peakDetector = PeakDetectorStage(
+            PeakDetectorConfig(
+                minimumMagnitude = 0.1f,
+                requiredStableFrames = 1,
+                allowDuplicates = true
+            )
+        )
+        val fskDecoder = FSKDecoder()
+        
+        try {
+            currentEngine.recorder.samples
+                .map { frame -> pipeline.process(frame) }
+                .mapNotNull { processedFrame ->
+                    val spectrum = processor.process(processedFrame.samples)
+                    peakDetector.detect(spectrum, processedFrame.timestamp)
+                }
+                .map { detection ->
+                    fskDecoder.decode(detection)
+                }
+                .collect { bit ->
+                    emit(bit)
+                }
+        } finally {
+            processor.release()
+        }
+    }
+
+    val receivedData: Flow<ByteArray> = flow {
+        val bitDecoder = DefaultBitDecoder()
+        val bitStreamCollector = BitStreamCollector()
+        
+        var currentBit: Int? = null
+        var bitFrames = 0
+        val framesPerSymbol = 5 // ~42ms * 5 = 210ms (matching 200ms symbol)
+
+        decodedBits.collect { bit ->
+            if (bit == currentBit) {
+                bitFrames++
+            } else {
+                if (currentBit != null && currentBit != -1) { // -1 could be "lost" but here fskDecoder returns null for lost
+                    val numBits = (bitFrames.toFloat() / framesPerSymbol + 0.5f).toInt()
+                    repeat(numBits) { bitStreamCollector.addBit(currentBit!!) }
+                    
+                    while (bitStreamCollector.getBits().size >= 8) {
+                        val allBits = bitStreamCollector.getBits()
+                        val bytes = bitDecoder.decode(allBits.take(8))
+                        emit(bytes)
+                        bitStreamCollector.consume(8)
+                    }
+                }
+                currentBit = bit
+                bitFrames = 1
+            }
+        }
+    }
 
     val carrierEvents: Flow<CarrierEvent> = flow {
         val currentEngine = getOrInitializeEngine()
@@ -97,8 +158,8 @@ object Whisper {
 
     suspend fun transmit(data: ByteArray) = mutex.withLock {
         val currentEngine = getOrInitializeEngine()
-        // TODO: Use ModemEncoder to convert data to samples
-        val samples = FloatArray(0) 
+        val encoder = FSKEncoder()
+        val samples = encoder.encode(data)
         currentEngine.player.play(
             AudioFrame(
                 samples = samples,

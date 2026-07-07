@@ -18,6 +18,9 @@ fun App() {
     var magnitude by remember { mutableStateOf(0f) }
     var isListening by remember { mutableStateOf(value = false) }
     var isCarrierDetected by remember { mutableStateOf(value = false) }
+    var receivedText by remember { mutableStateOf("") }
+    var decodedBits by remember { mutableStateOf("") }
+    var textToTransmit by remember { mutableStateOf("HELLO") }
 
     LaunchedEffect(isListening) {
         if (isListening) {
@@ -33,6 +36,20 @@ fun App() {
                         is CarrierDetected -> true
                         CarrierLost -> false
                     }
+                }
+            }
+            launch {
+                Whisper.decodedBits.collect { bit ->
+                    if (bit != -1) {
+                        decodedBits += bit.toString()
+                    } else {
+                        decodedBits += "_"
+                    }
+                }
+            }
+            launch {
+                Whisper.receivedData.collect { data ->
+                    receivedText += data.decodeToString()
                 }
             }
         }
@@ -64,6 +81,25 @@ fun App() {
                 Text("Play 19 kHz")
             }
 
+            OutlinedTextField(
+                value = textToTransmit,
+                onValueChange = { textToTransmit = it },
+                label = { Text("Text to Transmit") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Button(
+                onClick = {
+                    scope.launch {
+                        Whisper.transmit(textToTransmit.encodeToByteArray())
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = textToTransmit.isNotEmpty()
+            ) {
+                Text("Transmit Text")
+            }
+
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                 Button(onClick = {
                     scope.launch {
@@ -91,6 +127,18 @@ fun App() {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text("Magnitude:", style = MaterialTheme.typography.h6)
                     Text(magnitude.toString(), style = MaterialTheme.typography.h4)
+                }
+            }
+
+            Card(elevation = 4.dp, modifier = Modifier.fillMaxWidth().weight(1f)) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Received Data:", style = MaterialTheme.typography.h6)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(receivedText, style = MaterialTheme.typography.body1)
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text("Raw Bits (Live):", style = MaterialTheme.typography.subtitle2)
+                    Text(decodedBits, style = MaterialTheme.typography.caption)
                 }
             }
         }

@@ -7,7 +7,8 @@ import kotlin.math.abs
 data class PeakDetectorConfig(
     val minimumMagnitude: Float = 0.25f,
     val stabilityToleranceHz: Float = 100f,
-    val requiredStableFrames: Int = 5
+    val requiredStableFrames: Int = 5,
+    val allowDuplicates: Boolean = false
 )
 
 class PeakDetectorStage(
@@ -56,8 +57,8 @@ class PeakDetectorStage(
 
             if (isStable) {
                 val averageFreq = history.map { it.frequency }.average().toFloat()
-                // Only emit if it's the first time or if it changed significantly
-                if (lastEmittedFrequency == null || abs(averageFreq - lastEmittedFrequency!!) > config.stabilityToleranceHz) {
+                // Only emit if it's the first time or if it changed significantly, or if duplicates are allowed
+                if (config.allowDuplicates || lastEmittedFrequency == null || abs(averageFreq - lastEmittedFrequency!!) > config.stabilityToleranceHz) {
                     println("Stable frequency detected: $averageFreq Hz, magnitude: $maxMagnitude")
                     lastEmittedFrequency = averageFreq
                     return currentDetection.copy(frequency = averageFreq)
