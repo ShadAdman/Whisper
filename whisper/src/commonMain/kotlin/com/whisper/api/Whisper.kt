@@ -5,14 +5,12 @@ import com.whisper.audio.createAudioEngine
 import com.whisper.config.WhisperConfig
 import com.whisper.core.model.AudioFrame
 import com.whisper.core.model.FrequencyDetection
-import com.whisper.dsp.detector.DefaultFrequencyDetector
+import com.whisper.dsp.detector.PeakDetectorStage
 import com.whisper.dsp.fft.createFFTProcessor
 import com.whisper.dsp.generator.SignalGenerator
 import com.whisper.dsp.generator.createSignalGenerator
 import com.whisper.dsp.pipeline.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -32,15 +30,20 @@ object Whisper {
     val detectedFrequency: Flow<FrequencyDetection> = flow {
         val currentEngine = getOrInitializeEngine()
         val processor = createFFTProcessor(2048)
-        val detector = DefaultFrequencyDetector(processor)
+        val peakDetector = PeakDetectorStage()
         try {
             currentEngine.recorder.samples
                 .map { frame -> pipeline.process(frame) }
-                .collect { processedFrame ->
-                    emit(detector.detectFrequency(processedFrame))
+                .mapNotNull { processedFrame ->
+                    val spectrum = processor.process(processedFrame.samples)
+                    peakDetector.detect(spectrum, processedFrame.timestamp)
+                }
+                .collect { detection ->
+                    emit(detection)
                 }
         } finally {
             processor.release()
+            pipeline.release()
         }
     }
 
