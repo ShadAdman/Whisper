@@ -6,6 +6,7 @@ import com.whisper.config.WhisperConfig
 import com.whisper.core.model.AudioFrame
 import com.whisper.core.model.CarrierEvent
 import com.whisper.core.model.FrequencyDetection
+import com.whisper.core.packet.*
 import com.whisper.dsp.detector.CarrierDetector
 import com.whisper.dsp.detector.PeakDetectorConfig
 import com.whisper.dsp.detector.PeakDetectorStage
@@ -61,9 +62,10 @@ object Whisper {
         }
     }
 
-    val receivedData: Flow<ByteArray> = flow {
+    val receivedPackets: Flow<WhisperPacket> = flow {
         val bitDecoder = DefaultBitDecoder()
         val bitStreamCollector = BitStreamCollector()
+        val synchronizer = PacketSynchronizer()
         
         var currentBit: Int? = null
         var bitFrames = 0
@@ -73,14 +75,17 @@ object Whisper {
             if (bit == currentBit) {
                 bitFrames++
             } else {
-                if (currentBit != null && currentBit != -1) { // -1 could be "lost" but here fskDecoder returns null for lost
+                if (currentBit != null && currentBit != -1) {
                     val numBits = (bitFrames.toFloat() / framesPerSymbol + 0.5f).toInt()
                     repeat(numBits) { bitStreamCollector.addBit(currentBit!!) }
                     
                     while (bitStreamCollector.getBits().size >= 8) {
                         val allBits = bitStreamCollector.getBits()
                         val bytes = bitDecoder.decode(allBits.take(8))
-                        emit(bytes)
+                        val packet = synchronizer.processByte(bytes[0])
+                        if (packet != null) {
+                            emit(packet)
+                        }
                         bitStreamCollector.consume(8)
                     }
                 }
@@ -89,6 +94,8 @@ object Whisper {
             }
         }
     }
+
+    val receivedData: Flow<ByteArray> = receivedPackets.map { it.payload }
 
     val carrierEvents: Flow<CarrierEvent> = flow {
         val currentEngine = getOrInitializeEngine()
@@ -158,8 +165,12 @@ object Whisper {
 
     suspend fun transmit(data: ByteArray) = mutex.withLock {
         val currentEngine = getOrInitializeEngine()
+        val packet = WhisperPacket(payload = data)
+        val packetEncoder = DefaultPacketEncoder()
+        val encodedPacket = packetEncoder.encode(packet)
+        
         val encoder = FSKEncoder()
-        val samples = encoder.encode(data)
+        val samples = encoder.encode(encodedPacket)
         currentEngine.player.play(
             AudioFrame(
                 samples = samples,

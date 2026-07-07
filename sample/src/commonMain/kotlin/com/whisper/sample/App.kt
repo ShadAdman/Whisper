@@ -48,8 +48,8 @@ fun App() {
                 }
             }
             launch {
-                Whisper.receivedData.collect { data ->
-                    receivedText += data.decodeToString()
+                Whisper.receivedPackets.collect { packet ->
+                    receivedText += "\n[Packet] v${packet.version} type=${packet.type} len=${packet.payload.size}: ${packet.payload.decodeToString()}"
                 }
             }
         }
