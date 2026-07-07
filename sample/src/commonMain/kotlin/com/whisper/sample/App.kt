@@ -9,6 +9,8 @@ import com.whisper.api.Whisper
 import com.whisper.core.model.CarrierDetected
 import com.whisper.core.model.CarrierLost
 import com.whisper.core.model.FrequencyDetection
+import com.whisper.core.packet.InvalidPacket
+import com.whisper.core.packet.ValidPacket
 import kotlinx.coroutines.launch
 
 @Composable
@@ -21,6 +23,7 @@ fun App() {
     var receivedText by remember { mutableStateOf("") }
     var decodedBits by remember { mutableStateOf("") }
     var textToTransmit by remember { mutableStateOf("HELLO") }
+    var lastPacketStatus by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(isListening) {
         if (isListening) {
@@ -45,11 +48,22 @@ fun App() {
                     } else {
                         decodedBits += "_"
                     }
+                    if (decodedBits.length > 100) decodedBits = decodedBits.takeLast(100)
                 }
             }
             launch {
-                Whisper.receivedPackets.collect { packet ->
-                    receivedText += "\n[Packet] v${packet.version} type=${packet.type} len=${packet.payload.size}: ${packet.payload.decodeToString()}"
+                Whisper.packetResults.collect { result ->
+                    when (result) {
+                        is ValidPacket -> {
+                            val packet = result.packet
+                            receivedText += "\n[Packet] v${packet.version} type=${packet.type} len=${packet.payload.size}: ${packet.payload.decodeToString()}"
+                            lastPacketStatus = "CRC PASS (${packet.payload.size} bytes)"
+                        }
+                        InvalidPacket -> {
+                            receivedText += "\n[CORRUPTED PACKET]"
+                            lastPacketStatus = "CRC FAILED"
+                        }
+                    }
                 }
             }
         }
@@ -133,6 +147,9 @@ fun App() {
             Card(elevation = 4.dp, modifier = Modifier.fillMaxWidth().weight(1f)) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Received Data:", style = MaterialTheme.typography.h6)
+                    lastPacketStatus?.let {
+                        Text(it, style = MaterialTheme.typography.caption, color = if (it.contains("PASS")) MaterialTheme.colors.primary else MaterialTheme.colors.error)
+                    }
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(receivedText, style = MaterialTheme.typography.body1)
                     

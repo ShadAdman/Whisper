@@ -62,7 +62,7 @@ object Whisper {
         }
     }
 
-    val receivedPackets: Flow<WhisperPacket> = flow {
+    val packetResults: Flow<PacketResult> = flow {
         val bitDecoder = DefaultBitDecoder()
         val bitStreamCollector = BitStreamCollector()
         val synchronizer = PacketSynchronizer()
@@ -82,9 +82,9 @@ object Whisper {
                     while (bitStreamCollector.getBits().size >= 8) {
                         val allBits = bitStreamCollector.getBits()
                         val bytes = bitDecoder.decode(allBits.take(8))
-                        val packet = synchronizer.processByte(bytes[0])
-                        if (packet != null) {
-                            emit(packet)
+                        val result = synchronizer.processByte(bytes[0])
+                        if (result != null) {
+                            emit(result)
                         }
                         bitStreamCollector.consume(8)
                     }
@@ -94,6 +94,10 @@ object Whisper {
             }
         }
     }
+
+    val receivedPackets: Flow<WhisperPacket> = packetResults
+        .filterIsInstance<ValidPacket>()
+        .map { it.packet }
 
     val receivedData: Flow<ByteArray> = receivedPackets.map { it.payload }
 

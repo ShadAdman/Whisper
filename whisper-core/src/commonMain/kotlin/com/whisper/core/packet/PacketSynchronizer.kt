@@ -14,7 +14,7 @@ class PacketSynchronizer(
     private val buffer = mutableListOf<Byte>()
     private var expectedLength = 0
 
-    fun processByte(byte: Byte): WhisperPacket? {
+    fun processByte(byte: Byte): PacketResult? {
         buffer.add(byte)
 
         return when (state) {
@@ -36,10 +36,10 @@ class PacketSynchronizer(
                 null
             }
             State.READING_PAYLOAD -> {
-                if (buffer.size >= PacketConstants.HEADER_SIZE + expectedLength + 1) {
-                    val packet = decoder.decode(buffer.toByteArray())
+                if (buffer.size >= PacketConstants.HEADER_SIZE + expectedLength + PacketConstants.CRC_SIZE) {
+                    val result = decoder.decode(buffer.toByteArray())
                     reset()
-                    packet
+                    result
                 } else {
                     null
                 }
