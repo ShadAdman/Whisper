@@ -4,7 +4,9 @@ import com.whisper.audio.AudioEngine
 import com.whisper.audio.createAudioEngine
 import com.whisper.config.WhisperConfig
 import com.whisper.core.model.AudioFrame
+import com.whisper.core.model.CarrierEvent
 import com.whisper.core.model.FrequencyDetection
+import com.whisper.dsp.detector.CarrierDetector
 import com.whisper.dsp.detector.PeakDetectorStage
 import com.whisper.dsp.fft.createFFTProcessor
 import com.whisper.dsp.generator.SignalGenerator
@@ -27,6 +29,29 @@ object Whisper {
         )
     )
 
+    val carrierEvents: Flow<CarrierEvent> = flow {
+        val currentEngine = getOrInitializeEngine()
+        val processor = createFFTProcessor(2048)
+        val peakDetector = PeakDetectorStage()
+        val carrierDetector = CarrierDetector()
+        try {
+            currentEngine.recorder.samples
+                .map { frame -> pipeline.process(frame) }
+                .mapNotNull { processedFrame ->
+                    val spectrum = processor.process(processedFrame.samples)
+                    peakDetector.detect(spectrum, processedFrame.timestamp)
+                }
+                .mapNotNull { detection ->
+                    carrierDetector.process(detection)
+                }
+                .collect { event ->
+                    emit(event)
+                }
+        } finally {
+            processor.release()
+        }
+    }
+
     val detectedFrequency: Flow<FrequencyDetection> = flow {
         val currentEngine = getOrInitializeEngine()
         val processor = createFFTProcessor(2048)
@@ -43,7 +68,6 @@ object Whisper {
                 }
         } finally {
             processor.release()
-            pipeline.release()
         }
     }
 

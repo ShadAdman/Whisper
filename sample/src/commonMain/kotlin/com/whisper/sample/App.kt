@@ -6,6 +6,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.whisper.api.Whisper
+import com.whisper.core.model.CarrierDetected
+import com.whisper.core.model.CarrierLost
 import com.whisper.core.model.FrequencyDetection
 import kotlinx.coroutines.launch
 
@@ -15,12 +17,23 @@ fun App() {
     var detectedFreq by remember { mutableStateOf(0f) }
     var magnitude by remember { mutableStateOf(0f) }
     var isListening by remember { mutableStateOf(value = false) }
+    var isCarrierDetected by remember { mutableStateOf(value = false) }
 
     LaunchedEffect(isListening) {
         if (isListening) {
-            Whisper.detectedFrequency.collect { detection: FrequencyDetection ->
-                detectedFreq = detection.frequency
-                magnitude = detection.magnitude
+            launch {
+                Whisper.detectedFrequency.collect { detection: FrequencyDetection ->
+                    detectedFreq = detection.frequency
+                    magnitude = detection.magnitude
+                }
+            }
+            launch {
+                Whisper.carrierEvents.collect { event ->
+                    isCarrierDetected = when (event) {
+                        is CarrierDetected -> true
+                        CarrierLost -> false
+                    }
+                }
             }
         }
     }
@@ -28,6 +41,17 @@ fun App() {
     MaterialTheme {
         Column(modifier = Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Text("Whisper Tone Detection", style = MaterialTheme.typography.h4)
+
+            Card(elevation = 4.dp, modifier = Modifier.fillMaxWidth()) {
+                Row(modifier = Modifier.padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text("Carrier Status:", style = MaterialTheme.typography.h6)
+                    Text(
+                        if (isCarrierDetected) "DETECTED" else "NOT DETECTED",
+                        style = MaterialTheme.typography.h6,
+                        color = if (isCarrierDetected) MaterialTheme.colors.primary else MaterialTheme.colors.error
+                    )
+                }
+            }
 
             Button(
                 onClick = {
