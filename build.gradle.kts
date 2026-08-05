@@ -30,7 +30,7 @@ subprojects {
 
         extensions.configure<MavenPublishBaseExtension>("mavenPublishing") {
 
-            publishToMavenCentral()
+            publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
             signAllPublications()
 
             artifactIdProp?.let{
