@@ -1,5 +1,6 @@
 package com.whisper.doc
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -18,6 +19,8 @@ import org.jetbrains.compose.resources.Font
 import whisper.doc.generated.resources.Res
 import whisper.doc.generated.resources.LatoRegular
 import whisper.doc.generated.resources.LatoBold
+import whisper.doc.generated.resources.whisper_logo
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun LandingPage() {
@@ -88,7 +91,15 @@ fun LandingPage() {
                             textAlign = TextAlign.Center
                         )
 
-                        Spacer(modifier = Modifier.height(48.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Image(
+                            painter = painterResource(Res.drawable.whisper_logo),
+                            contentDescription = "Whisper Logo",
+                            modifier = Modifier.size(120.dp)
+                        )
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
 
                         Text(
                             text = "Whisper",
@@ -132,6 +143,12 @@ fun LandingPage() {
                                 .padding(horizontal = 48.dp),
                             verticalArrangement = Arrangement.Center
                         ) {
+                            Image(
+                                painter = painterResource(Res.drawable.whisper_logo),
+                                contentDescription = "Whisper Logo",
+                                modifier = Modifier.size(160.dp)
+                            )
+                            Spacer(modifier = Modifier.height(24.dp))
                             Text(
                                 text = "Whisper",
                                 style = MaterialTheme.typography.displayLarge,

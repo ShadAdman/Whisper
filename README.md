@@ -1,4 +1,12 @@
-# Whisper
+<p align="center">
+  <img src="whisper-logo.png" width="200" alt="Whisper Logo">
+</p>
+
+# <p align="center">Whisper</p>
+
+<p align="center">
+  <img src="whisper.gif" width="600" alt="Whisper Animation">
+</p>
 
 Whisper is a communication protocol designed for decentralized and secure data exchange using near-ultrasound acoustic waves. It enables devices to communicate in close proximity without relying on traditional wireless technologies such as Wi-Fi, Bluetooth, or cellular networks.
 
