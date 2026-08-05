@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="whisper-logo.png" width="200" alt="Whisper Logo">
+  <img src="whisper-logo.png" width="150" alt="Whisper Logo">
 </p>
 
-# <p align="center">Whisper</p>
+<p align="center">Whisper</p>
 
 <p align="center">
   <img src="whisper.gif" width="600" alt="Whisper Animation">
