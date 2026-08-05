@@ -41,9 +41,9 @@ fun WhisperAnimation(modifier: Modifier = Modifier) {
     Canvas(modifier = modifier.fillMaxSize()) {
         val width = size.width
         val height = size.height
-        val phoneWidth = 80.dp.toPx()
-        val phoneHeight = 150.dp.toPx()
-        val phonePadding = 60.dp.toPx()
+        val phoneWidth = 100.dp.toPx()
+        val phoneHeight = 180.dp.toPx()
+        val phonePadding = 30.dp.toPx()
 
         val phone1X = phonePadding
         val phone2X = width - phonePadding - phoneWidth
@@ -51,44 +51,44 @@ fun WhisperAnimation(modifier: Modifier = Modifier) {
 
         // Draw Phone 1
         drawRoundRect(
-            color = Color.Gray,
+            color = Color.White.copy(alpha = 0.7f),
             topLeft = Offset(phone1X, centerY - phoneHeight / 2),
             size = Size(phoneWidth, phoneHeight),
-            cornerRadius = CornerRadius(12.dp.toPx(), 12.dp.toPx()),
+            cornerRadius = CornerRadius(16.dp.toPx(), 16.dp.toPx()),
             style = Stroke(width = 3.dp.toPx())
         )
         
         // Phone 1 screen
-        val phone1ScreenColor = if (dataProgress.value < 0.1f) Color.Cyan else Color.Cyan.copy(alpha = 0.3f)
+        val phone1ScreenColor = if (dataProgress.value < 0.1f) Color(0xFF64B5F6) else Color(0xFF64B5F6).copy(alpha = 0.2f)
         drawRoundRect(
             color = phone1ScreenColor,
             topLeft = Offset(phone1X + 8.dp.toPx(), centerY - phoneHeight / 2 + 12.dp.toPx()),
             size = Size(phoneWidth - 16.dp.toPx(), phoneHeight - 32.dp.toPx()),
-            cornerRadius = CornerRadius(6.dp.toPx(), 6.dp.toPx())
+            cornerRadius = CornerRadius(8.dp.toPx(), 8.dp.toPx())
         )
 
         // Draw Phone 2
         drawRoundRect(
-            color = Color.Gray,
+            color = Color.White.copy(alpha = 0.7f),
             topLeft = Offset(phone2X, centerY - phoneHeight / 2),
             size = Size(phoneWidth, phoneHeight),
-            cornerRadius = CornerRadius(12.dp.toPx(), 12.dp.toPx()),
+            cornerRadius = CornerRadius(16.dp.toPx(), 16.dp.toPx()),
             style = Stroke(width = 3.dp.toPx())
         )
         
         // Phone 2 screen
-        val phone2ScreenColor = if (dataProgress.value > 0.9f) Color.Green else Color.Green.copy(alpha = 0.3f)
+        val phone2ScreenColor = if (dataProgress.value > 0.9f) Color(0xFF81C784) else Color(0xFF81C784).copy(alpha = 0.2f)
         drawRoundRect(
             color = phone2ScreenColor,
             topLeft = Offset(phone2X + 8.dp.toPx(), centerY - phoneHeight / 2 + 12.dp.toPx()),
             size = Size(phoneWidth - 16.dp.toPx(), phoneHeight - 32.dp.toPx()),
-            cornerRadius = CornerRadius(6.dp.toPx(), 6.dp.toPx())
+            cornerRadius = CornerRadius(8.dp.toPx(), 8.dp.toPx())
         )
 
         // Nearby device indicator (small pulsing dot above Phone 2)
         val pulse = (sin(waveProgress.value * PI.toFloat() * 2) + 1f) / 2f
         drawCircle(
-            color = Color.Green.copy(alpha = pulse),
+            color = Color(0xFF81C784).copy(alpha = pulse),
             radius = 6.dp.toPx(),
             center = Offset(phone2X + phoneWidth / 2, centerY - phoneHeight / 2 - 20.dp.toPx())
         )
@@ -105,13 +105,13 @@ fun WhisperAnimation(modifier: Modifier = Modifier) {
             val alpha = 1f - progress
             
             drawArc(
-                color = Color(0xFF64B5F6).copy(alpha = alpha * 0.6f),
+                color = Color(0xFF64B5F6).copy(alpha = alpha * 0.7f),
                 startAngle = -60f,
                 sweepAngle = 120f,
                 useCenter = false,
-                topLeft = Offset(x - 30.dp.toPx(), centerY - 60.dp.toPx()),
-                size = Size(60.dp.toPx(), 120.dp.toPx()),
-                style = Stroke(width = 3.dp.toPx())
+                topLeft = Offset(x - 35.dp.toPx(), centerY - 70.dp.toPx()),
+                size = Size(70.dp.toPx(), 140.dp.toPx()),
+                style = Stroke(width = 4.dp.toPx())
             )
         }
 
@@ -121,8 +121,9 @@ fun WhisperAnimation(modifier: Modifier = Modifier) {
         
         drawCircle(
             color = Color(0xFFFF4081),
-            radius = 6.dp.toPx(),
+            radius = 8.dp.toPx(),
             center = Offset(packetX, packetY)
         )
     }
+
 }
