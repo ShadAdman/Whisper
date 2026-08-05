@@ -16,7 +16,6 @@ android {
 }
 
 kotlin {
-    jvmToolchain(17)
     applyDefaultHierarchyTemplate()
     
     androidTarget()
