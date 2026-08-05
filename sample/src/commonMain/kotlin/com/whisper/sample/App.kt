@@ -1,11 +1,15 @@
 package com.whisper.sample
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.whisper.api.Whisper
+import com.whisper.config.WhisperConfig
+import com.whisper.core.error.FecConfig
 import com.whisper.core.model.CarrierDetected
 import com.whisper.core.model.CarrierLost
 import com.whisper.core.model.FrequencyDetection
@@ -24,6 +28,16 @@ fun App() {
     var decodedBits by remember { mutableStateOf("") }
     var textToTransmit by remember { mutableStateOf("HELLO") }
     var lastPacketStatus by remember { mutableStateOf<String?>(null) }
+    
+    val scrollState = rememberScrollState()
+    
+    var isFecEnabled by remember { mutableStateOf(true) }
+    var redundancy by remember { mutableStateOf(3) }
+    
+
+    LaunchedEffect(isFecEnabled, redundancy) {
+        Whisper.configure(WhisperConfig(fecConfig = FecConfig(enabled = isFecEnabled, redundancy = redundancy)))
+    }
 
     LaunchedEffect(isListening) {
         if (isListening) {
@@ -70,17 +84,36 @@ fun App() {
     }
 
     MaterialTheme {
-        Column(modifier = Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Column(modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(scrollState), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Text("Whisper Tone Detection", style = MaterialTheme.typography.h4)
 
             Card(elevation = 4.dp, modifier = Modifier.fillMaxWidth()) {
-                Row(modifier = Modifier.padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("Carrier Status:", style = MaterialTheme.typography.h6)
-                    Text(
-                        if (isCarrierDetected) "DETECTED" else "NOT DETECTED",
-                        style = MaterialTheme.typography.h6,
-                        color = if (isCarrierDetected) MaterialTheme.colors.primary else MaterialTheme.colors.error
-                    )
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text("Carrier Status:", style = MaterialTheme.typography.h6)
+                        Text(
+                            if (isCarrierDetected) "DETECTED" else "NOT DETECTED",
+                            style = MaterialTheme.typography.h6,
+                            color = if (isCarrierDetected) MaterialTheme.colors.primary else MaterialTheme.colors.error
+                        )
+                    }
+                    Divider()
+                    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                        Checkbox(checked = isFecEnabled, onCheckedChange = { isFecEnabled = it })
+                        Text("Enable FEC (Repetition)")
+                    }
+                    if (isFecEnabled) {
+                        Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                            Text("Redundancy: $redundancy")
+                            Slider(
+                                value = redundancy.toFloat(),
+                                onValueChange = { redundancy = it.toInt() },
+                                valueRange = 1f..7f,
+                                steps = 5,
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+                        }
+                    }
                 }
             }
 
@@ -144,7 +177,7 @@ fun App() {
                 }
             }
 
-            Card(elevation = 4.dp, modifier = Modifier.fillMaxWidth().weight(1f)) {
+            Card(elevation = 4.dp, modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Received Data:", style = MaterialTheme.typography.h6)
                     lastPacketStatus?.let {

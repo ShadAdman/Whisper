@@ -6,8 +6,7 @@ import kotlin.math.PI
 
 class NativeSignalGenerator : SignalGenerator {
     @OptIn(ExperimentalForeignApi::class)
-    override fun generateTone(frequency: Float, durationMs: Int): FloatArray {
-        val sampleRate = 44100.0f
+    override fun generateTone(frequency: Float, durationMs: Int, sampleRate: Float): FloatArray {
         val numSamples = (sampleRate * durationMs / 1000.0f).toInt()
         val result = FloatArray(numSamples)
         

@@ -3,7 +3,8 @@ package com.whisper.dsp.generator
 interface SignalGenerator {
     fun generateTone(
         frequency: Float,
-        durationMs: Int
+        durationMs: Int,
+        sampleRate: Float = 48000f
     ): FloatArray
 
     companion object {

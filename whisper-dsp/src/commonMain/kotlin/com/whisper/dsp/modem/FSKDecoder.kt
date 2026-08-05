@@ -11,10 +11,16 @@ class FSKDecoder(
         if (detection.magnitude <= 0f || detection.frequency <= 0f) return -1 // -1 for lost signal
 
         val isZero = abs(detection.frequency - config.frequencyZero) <= config.frequencyTolerance
-        if (isZero) return 0
+        if (isZero) {
+            // println("FSKDecoder: Decoded bit 0 (${detection.frequency}Hz)")
+            return 0
+        }
 
         val isOne = abs(detection.frequency - config.frequencyOne) <= config.frequencyTolerance
-        if (isOne) return 1
+        if (isOne) {
+            // println("FSKDecoder: Decoded bit 1 (${detection.frequency}Hz)")
+            return 1
+        }
 
         return -1
     }

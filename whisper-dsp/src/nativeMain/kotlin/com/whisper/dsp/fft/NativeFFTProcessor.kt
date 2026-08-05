@@ -10,7 +10,7 @@ class NativeFFTProcessor(private val fftSize: Int) : FFTProcessor {
     private val output = nativeHeap.allocArray<FloatVar>(fftSize * 2)
     private val plan = fft_create_plan(fftSize.toUInt(), input.reinterpret(), output.reinterpret(), -1, 0)!!
 
-    override fun process(samples: FloatArray): FrequencySpectrum {
+    override fun process(samples: FloatArray, sampleRate: Float): FrequencySpectrum {
         for (i in 0 until fftSize) {
             if (i < samples.size) {
                 input[2 * i] = samples[i]
@@ -32,7 +32,7 @@ class NativeFFTProcessor(private val fftSize: Int) : FFTProcessor {
         }
 
         val frequencies = FloatArray(magnitudesSize) { i ->
-            i * (48000f / fftSize)
+            i * (sampleRate / fftSize)
         }
 
         return FrequencySpectrum(frequencies, magnitudes)

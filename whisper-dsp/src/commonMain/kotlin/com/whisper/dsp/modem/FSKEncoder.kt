@@ -6,10 +6,11 @@ import kotlin.math.sin
 class FSKEncoder(
     private val config: FSKConfig = FSKConfig(),
     private val sampleRate: Float = 48000f,
-    private val symbolDurationMs: Int = 200 // Increased for reliability
+    private val symbolDurationMs: Int = 200
 ) : ModemEncoder {
 
     override fun encode(data: ByteArray): FloatArray {
+        // println("FSKEncoder: Encoding ${data.size} bytes at $sampleRate Hz")
         val bits = mutableListOf<Int>()
         for (byte in data) {
             val b = byte.toInt()

@@ -2,6 +2,7 @@ package com.whisper.dsp.detector
 
 import com.whisper.core.model.FrequencyDetection
 import com.whisper.core.model.FrequencySpectrum
+import com.whisper.core.util.WLogger
 import kotlin.math.abs
 
 data class PeakDetectorConfig(
@@ -30,14 +31,18 @@ class PeakDetectorStage(
 
         val currentDetection = FrequencyDetection(maxFrequency, maxMagnitude, timestamp)
 
+        if (maxMagnitude > 0.1f) {
+            WLogger.d("PeakDetectorStage", "Strongest peak at $maxFrequency Hz, mag: $maxMagnitude")
+        }
+
         // 1. Check Magnitude Threshold
         if (maxMagnitude < config.minimumMagnitude) {
             if (maxMagnitude > 0.01f) {
-                 println("Peak detected but too weak: $maxFrequency Hz, mag: $maxMagnitude")
+                 WLogger.d("PeakDetectorStage", "Peak detected but too weak: $maxFrequency Hz, mag: $maxMagnitude")
             }
             history.clear()
             return if (lastEmittedFrequency != null) {
-                println("Signal lost: last freq was $lastEmittedFrequency")
+                WLogger.i("PeakDetectorStage", "Signal lost: last freq was $lastEmittedFrequency")
                 lastEmittedFrequency = null
                 FrequencyDetection(0f, 0f, timestamp) // Signal lost
             } else {
@@ -59,12 +64,12 @@ class PeakDetectorStage(
                 val averageFreq = history.map { it.frequency }.average().toFloat()
                 // Only emit if it's the first time or if it changed significantly, or if duplicates are allowed
                 if (config.allowDuplicates || lastEmittedFrequency == null || abs(averageFreq - lastEmittedFrequency!!) > config.stabilityToleranceHz) {
-                    println("Stable frequency detected: $averageFreq Hz, magnitude: $maxMagnitude")
+                    WLogger.i("PeakDetectorStage", "Stable frequency detected: $averageFreq Hz, magnitude: $maxMagnitude")
                     lastEmittedFrequency = averageFreq
                     return currentDetection.copy(frequency = averageFreq)
                 }
             } else {
-                 println("Frequency unstable: ${history.map { it.frequency.toInt() }}")
+                 WLogger.d("PeakDetectorStage", "Frequency unstable: ${history.map { it.frequency.toInt() }}")
             }
         }
 

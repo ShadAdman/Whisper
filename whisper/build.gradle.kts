@@ -29,7 +29,7 @@ kotlin {
         commonMain.dependencies {
             api(project(":whisper-core"))
             implementation(project(":whisper-dsp"))
-            implementation(project(":whisper-audio"))
+            api(project(":whisper-audio"))
             implementation(libs.kotlinx.coroutines.core)
         }
         commonTest.dependencies {

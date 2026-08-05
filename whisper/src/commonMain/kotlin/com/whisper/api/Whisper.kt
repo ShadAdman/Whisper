@@ -7,6 +7,7 @@ import com.whisper.core.model.AudioFrame
 import com.whisper.core.model.CarrierEvent
 import com.whisper.core.model.FrequencyDetection
 import com.whisper.core.packet.*
+import com.whisper.core.util.WLogger
 import com.whisper.dsp.detector.CarrierDetector
 import com.whisper.dsp.detector.PeakDetectorConfig
 import com.whisper.dsp.detector.PeakDetectorStage
@@ -15,12 +16,16 @@ import com.whisper.dsp.generator.SignalGenerator
 import com.whisper.dsp.generator.createSignalGenerator
 import com.whisper.dsp.modem.*
 import com.whisper.dsp.pipeline.*
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 object Whisper {
-    private val mutex = Mutex()
+    private val engineMutex = Mutex()
+    private val recorderMutex = Mutex()
+    private val playerMutex = Mutex()
+    
     private var engine: AudioEngine? = null
     private var config: WhisperConfig = WhisperConfig()
 
@@ -32,40 +37,27 @@ object Whisper {
         )
     )
 
+    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+
+    private val _rawDetections = MutableSharedFlow<FrequencyDetection>()
+    val rawDetections: Flow<FrequencyDetection> = _rawDetections
+
+    private var detectionJob: Job? = null
+
+    val detectedFrequency: Flow<FrequencyDetection> = rawDetections
+        .filter { it.frequency > 0 }
+
     val decodedBits: Flow<Int> = flow {
-        val currentEngine = getOrInitializeEngine()
-        val processor = createFFTProcessor(2048)
-        val peakDetector = PeakDetectorStage(
-            PeakDetectorConfig(
-                minimumMagnitude = 0.1f,
-                requiredStableFrames = 1,
-                allowDuplicates = true
-            )
-        )
         val fskDecoder = FSKDecoder()
-        
-        try {
-            currentEngine.recorder.samples
-                .map { frame -> pipeline.process(frame) }
-                .mapNotNull { processedFrame ->
-                    val spectrum = processor.process(processedFrame.samples)
-                    peakDetector.detect(spectrum, processedFrame.timestamp)
-                }
-                .map { detection ->
-                    fskDecoder.decode(detection)
-                }
-                .collect { bit ->
-                    emit(bit)
-                }
-        } finally {
-            processor.release()
+        rawDetections.collect { detection ->
+            emit(fskDecoder.decode(detection))
         }
     }
 
     val packetResults: Flow<PacketResult> = flow {
         val bitDecoder = DefaultBitDecoder()
         val bitStreamCollector = BitStreamCollector()
-        val synchronizer = PacketSynchronizer()
+        val synchronizer = PacketSynchronizer(fecConfig = config.fecConfig)
         
         var currentBit: Int? = null
         var bitFrames = 0
@@ -102,83 +94,89 @@ object Whisper {
     val receivedData: Flow<ByteArray> = receivedPackets.map { it.payload }
 
     val carrierEvents: Flow<CarrierEvent> = flow {
-        val currentEngine = getOrInitializeEngine()
-        val processor = createFFTProcessor(2048)
-        val peakDetector = PeakDetectorStage()
         val carrierDetector = CarrierDetector()
-        try {
-            currentEngine.recorder.samples
-                .map { frame -> pipeline.process(frame) }
-                .mapNotNull { processedFrame ->
-                    val spectrum = processor.process(processedFrame.samples)
-                    peakDetector.detect(spectrum, processedFrame.timestamp)
-                }
-                .mapNotNull { detection ->
-                    carrierDetector.process(detection)
-                }
-                .collect { event ->
-                    emit(event)
-                }
-        } finally {
-            processor.release()
+        rawDetections.collect { detection ->
+            val event = carrierDetector.process(detection)
+            if (event != null) {
+                WLogger.i("Whisper", "Carrier event emitted: $event")
+                emit(event)
+            }
         }
     }
 
-    val detectedFrequency: Flow<FrequencyDetection> = flow {
-        val currentEngine = getOrInitializeEngine()
-        val processor = createFFTProcessor(2048)
-        val peakDetector = PeakDetectorStage()
-        try {
-            currentEngine.recorder.samples
-                .map { frame -> pipeline.process(frame) }
-                .mapNotNull { processedFrame ->
-                    val spectrum = processor.process(processedFrame.samples)
-                    peakDetector.detect(spectrum, processedFrame.timestamp)
-                }
-                .collect { detection ->
-                    emit(detection)
-                }
-        } finally {
-            processor.release()
-        }
-    }
-
-    suspend fun startListening() = mutex.withLock {
+    suspend fun startListening() = recorderMutex.withLock {
+        WLogger.i("Whisper", "startListening called")
         val currentEngine = getOrInitializeEngine()
         currentEngine.recorder.start()
+
+        if (detectionJob == null) {
+            detectionJob = scope.launch {
+                WLogger.i("Whisper", "Starting detection loop")
+                val processor = createFFTProcessor(2048)
+                val peakDetector = PeakDetectorStage(
+                    PeakDetectorConfig(
+                        minimumMagnitude = 0.001f, // Extremely sensitive for testing
+                        requiredStableFrames = 1,
+                        allowDuplicates = true
+                    )
+                )
+                try {
+                    currentEngine.recorder.samples
+                        .map { frame -> pipeline.process(frame) }
+                        .mapNotNull { processedFrame ->
+                            val spectrum = processor.process(processedFrame.samples, processedFrame.sampleRate.toFloat())
+                            peakDetector.detect(spectrum, processedFrame.timestamp)
+                        }
+                        .collect { detection ->
+                            WLogger.d("Whisper", "Peak: ${detection.frequency.toInt()}Hz, mag: ${detection.magnitude}")
+                            _rawDetections.emit(detection)
+                        }
+                } catch (e: Exception) {
+                    WLogger.e("Whisper", "Detection loop error: ${e.message}")
+                } finally {
+                    WLogger.i("Whisper", "Releasing processor")
+                    processor.release()
+                }
+            }
+        }
     }
 
-    suspend fun stopListening() = mutex.withLock {
+    suspend fun stopListening() = recorderMutex.withLock {
+        WLogger.i("Whisper", "stopListening called")
+        detectionJob?.cancelAndJoin()
+        detectionJob = null
         engine?.recorder?.stop()
     }
 
-    suspend fun playTestTone() = mutex.withLock {
+    suspend fun playTestTone() = playerMutex.withLock {
         val currentEngine = getOrInitializeEngine()
         val generator = createSignalGenerator()
-        val samples = generator.generateTone(19000f, 1000)
-        println("Samples Has been generated and post to player")
+        val frequency = 19000f
+        val samples = generator.generateTone(frequency, 2000, config.sampleRate.toFloat()) // 2 seconds
+        WLogger.i("Whisper", "Playing $frequency Hz test tone")
         currentEngine.player.play(
             AudioFrame(
                 samples = samples,
-                sampleRate = 48000,
+                sampleRate = config.sampleRate,
                 channels = 1,
-                timestamp = 0 // In play mode timestamp might be less critical or current time
+                timestamp = 0
             )
         )
     }
 
-    suspend fun transmit(data: ByteArray) = mutex.withLock {
+    suspend fun transmit(data: ByteArray) = playerMutex.withLock {
         val currentEngine = getOrInitializeEngine()
         val packet = WhisperPacket(payload = data)
         val packetEncoder = DefaultPacketEncoder()
-        val encodedPacket = packetEncoder.encode(packet)
+        val encodedPacket = packetEncoder.encode(packet, config.fecConfig)
         
-        val encoder = FSKEncoder()
+        val encoder = FSKEncoder(sampleRate = config.sampleRate.toFloat())
         val samples = encoder.encode(encodedPacket)
+        WLogger.i("Whisper", "Transmitting ${data.size} bytes (${samples.size} samples)")
         currentEngine.player.play(
             AudioFrame(
                 samples = samples,
-                sampleRate = 48000,
+                sampleRate = config.sampleRate,
                 channels = 1,
                 timestamp = 0
             )
@@ -190,9 +188,11 @@ object Whisper {
     }
 
     private suspend fun getOrInitializeEngine(): AudioEngine {
-        return engine ?: createAudioEngine().also {
-            it.setup()
-            engine = it
+        return engine ?: engineMutex.withLock {
+            engine ?: createAudioEngine().also {
+                it.setup()
+                engine = it
+            }
         }
     }
 }

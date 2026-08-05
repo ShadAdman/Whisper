@@ -4,8 +4,7 @@ import kotlin.math.PI
 import kotlin.math.sin
 
 class KotlinSignalGenerator : SignalGenerator {
-    override fun generateTone(frequency: Float, durationMs: Int): FloatArray {
-        val sampleRate = 48000f // Requirement says 48 kHz
+    override fun generateTone(frequency: Float, durationMs: Int, sampleRate: Float): FloatArray {
         val numSamples = (sampleRate * durationMs / 1000f).toInt()
         val result = FloatArray(numSamples)
         

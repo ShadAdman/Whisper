@@ -12,11 +12,11 @@ class AndroidSignalGenerator : SignalGenerator {
         }
     }
 
-    override fun generateTone(frequency: Float, durationMs: Int): FloatArray {
-        return nativeGenerateTone(frequency, durationMs)
+    override fun generateTone(frequency: Float, durationMs: Int, sampleRate: Float): FloatArray {
+        return nativeGenerateTone(frequency, durationMs, sampleRate)
     }
 
-    private external fun nativeGenerateTone(frequency: Float, durationMs: Int): FloatArray
+    private external fun nativeGenerateTone(frequency: Float, durationMs: Int, sampleRate: Float): FloatArray
 }
 
 actual fun createSignalGenerator(): SignalGenerator = AndroidSignalGenerator()

@@ -13,9 +13,9 @@ Java_com_whisper_dsp_generator_AndroidSignalGenerator_nativeGenerateTone(
     JNIEnv *env,
     jobject thiz,
     jfloat frequency,
-    jint durationMs
+    jint durationMs,
+    jfloat sampleRate
 ) {
-    const float sampleRate = 44100.0f;
     int numSamples = static_cast<int>(sampleRate * durationMs / 1000.0f);
 
     std::vector<float> result(numSamples);

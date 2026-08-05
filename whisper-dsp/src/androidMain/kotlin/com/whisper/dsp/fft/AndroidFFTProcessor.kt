@@ -9,12 +9,12 @@ class AndroidFFTProcessor(private val fftSize: Int) : FFTProcessor {
         nativePtr = nativeCreate(fftSize)
     }
 
-    override fun process(samples: FloatArray): FrequencySpectrum {
+    override fun process(samples: FloatArray, sampleRate: Float): FrequencySpectrum {
         val magnitudes = FloatArray(fftSize / 2 + 1)
         nativeProcess(nativePtr, samples, magnitudes)
         
         val frequencies = FloatArray(magnitudes.size) { i ->
-            i * (48000f / fftSize)
+            i * (sampleRate / fftSize)
         }
         
         return FrequencySpectrum(frequencies, magnitudes)
