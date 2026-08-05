@@ -33,6 +33,9 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
       - name: Build Documentation
         run: ./gradlew :doc:wasmJsBrowserDistribution --no-daemon
 
