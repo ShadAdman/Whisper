@@ -28,6 +28,7 @@ fun App() {
     var decodedBits by remember { mutableStateOf("") }
     var textToTransmit by remember { mutableStateOf("HELLO") }
     var lastPacketStatus by remember { mutableStateOf<String?>(null) }
+    var nearbyDevices by remember { mutableStateOf(setOf<String>()) }
     
     val scrollState = rememberScrollState()
     
@@ -70,7 +71,9 @@ fun App() {
                     when (result) {
                         is ValidPacket -> {
                             val packet = result.packet
-                            receivedText += "\n[Packet] v${packet.version} type=${packet.type} len=${packet.payload.size}: ${packet.payload.decodeToString()}"
+                            val payloadText = packet.payload.decodeToString()
+                            receivedText += "\n[Packet] v${packet.version} type=${packet.type} len=${packet.payload.size}: $payloadText"
+                            nearbyDevices = nearbyDevices + payloadText
                             lastPacketStatus = "CRC PASS (${packet.payload.size} bytes)"
                         }
                         InvalidPacket -> {
@@ -174,6 +177,38 @@ fun App() {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text("Magnitude:", style = MaterialTheme.typography.h6)
                     Text(magnitude.toString(), style = MaterialTheme.typography.h4)
+                }
+            }
+
+            Card(elevation = 4.dp, modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                        Text("Nearby Devices", style = MaterialTheme.typography.h6)
+                        if (isCarrierDetected) {
+                            Spacer(Modifier.width(8.dp))
+                            CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp)
+                        }
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    
+                    if (nearbyDevices.isEmpty()) {
+                        Text(
+                            text = if (isCarrierDetected) "Signal detected, waiting for ID..." else "Searching for nearby devices...",
+                            style = MaterialTheme.typography.caption,
+                            color = if (isCarrierDetected) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium)
+                        )
+                    } else {
+                        nearbyDevices.forEach { name ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                            ) {
+                                Text(name, style = MaterialTheme.typography.body1)
+                                Text("Online", color = MaterialTheme.colors.primary, style = MaterialTheme.typography.overline)
+                            }
+                        }
+                    }
                 }
             }
 
