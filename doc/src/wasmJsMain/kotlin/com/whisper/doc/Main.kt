@@ -9,6 +9,6 @@ fun main() {
         title = "Whisper Doc",
         canvasElementId = "compose-target"
     ) {
-        LandingPage()
+        NavHost()
     }
 }
