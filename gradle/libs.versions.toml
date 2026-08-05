@@ -7,6 +7,7 @@ compose-multiplatform = "1.6.11"
 androidx-activityCompose = "1.8.2"
 kmmbridge = "1.2.1"
 startup = "1.2.0"
+vanniktechPublish = "0.30.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -24,3 +25,4 @@ kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref =
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kmmbridge = { id = "co.touchlab.kmmbridge", version.ref = "kmmbridge" }
+vanniktechPublish = { id = "com.vanniktech.maven.publish", version.ref = "vanniktechPublish" }
