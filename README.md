@@ -142,6 +142,23 @@ Whisper is organized into several modules to maintain a clear separation of conc
 - **Desktop**: (On the way) support for Linux, macOS, and Windows.
 - **Web**: (On the way) support via Kotlin/Wasm.
 
+## Troubleshooting & Edge Cases
+
+### What if there is loud background noise?
+Whisper uses a bandpass filter to ignore frequencies outside the 18-22 kHz range. Most environmental noise (talking, music, traffic) is below 15 kHz. However, extremely loud metallic noises or specialized ultrasound jammers can cause interference. In these cases, increasing the FEC redundancy is recommended.
+
+### What if the devices are too far apart?
+The effective range of Whisper is typically 1-5 meters depending on the speaker volume and microphone sensitivity. Sound follows the inverse square law, so signal strength drops rapidly with distance. If you need more range, you should lower the carrier frequency (closer to 17 kHz) or increase the transmission volume.
+
+### What if I want to send large files?
+Whisper is optimized for low-bandwidth, high-reliability data like text, authentication tokens, or peer discovery info. Sending large files (megabytes) via sound is slow (approx. 100-500 bps). For large data, we recommend using Whisper to exchange Wi-Fi Direct or Bluetooth credentials, then switching to those high-speed channels.
+
+### What if a user has hearing aids?
+Some hearing aids can amplify high-frequency sounds. While Whisper operates near the edge of human hearing, users with sensitive equipment might hear a very faint 'whistle' or 'static'. We recommend providing a toggle in your app to disable acoustic features for accessibility.
+
+### What if the signal reflects off walls?
+Multipath interference is a common challenge in acoustic communication. Whisper's FSK modem includes guard intervals between symbols to allow echoes to die down before the next bit is processed, ensuring the decoder doesn't get confused by reflected waves.
+
 ## Security Note
 
 Whisper is designed for local, proximity-based communication. While it is decentralized by nature, users should implement their own encryption layers if they are transmitting sensitive information, as acoustic signals can be recorded by any nearby device with a microphone.
