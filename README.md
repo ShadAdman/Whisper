@@ -10,6 +10,30 @@
 
 Whisper is a communication protocol designed for decentralized and secure data exchange using near-ultrasound acoustic waves. It enables devices to communicate in close proximity without relying on traditional wireless technologies such as Wi-Fi, Bluetooth, or cellular networks.
 
+## Installation
+
+Add the dependency to your Multiplatform project's `commonMain` source set:
+
+```kotlin
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation("io.github.shadadman:whisper:0.90.0")
+        }
+    }
+}
+```
+
+Or for Android-only projects:
+
+```kotlin
+dependencies {
+    implementation("io.github.shadadman:whisper:0.90.0")
+}
+```
+
+Support for native iOS projects (Swift Package Manager & CocoaPods) is on the way.
+
 ## Core Concepts
 
 To effectively use Whisper, it is helpful to understand the underlying principles that make acoustic data transfer possible.
@@ -138,7 +162,7 @@ Whisper is organized into several modules to maintain a clear separation of conc
 ## Requirements
 
 - **Android**: API Level 29 or higher.
-- **iOS**: iOS 14.0 or higher.
+- **iOS**: (On the way) iOS 14.0 or higher.
 - **Desktop**: (On the way) support for Linux, macOS, and Windows.
 - **Web**: (On the way) support via Kotlin/Wasm.
 
