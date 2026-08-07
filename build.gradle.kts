@@ -68,7 +68,7 @@ subprojects {
             val keyPassword = System.getenv("ORG_GRADLE_PROJECT_signingInMemoryKeyPassword")
 
             if (keyId != null && key != null && keyPassword != null) {
-                useInMemoryPgpKeys(keyId, key, keyPassword)
+                useInMemoryPgpKeys(key, keyPassword)
             }
         }
     }
