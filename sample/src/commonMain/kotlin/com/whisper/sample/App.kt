@@ -88,7 +88,7 @@ fun App() {
 
     MaterialTheme {
         Column(modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(scrollState), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Text("Whisper Tone Detection", style = MaterialTheme.typography.h4)
+            Text("Whisper Example", style = MaterialTheme.typography.h4)
 
             Card(elevation = 4.dp, modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
