@@ -2,63 +2,67 @@ package com.whisper.audio
 
 import com.whisper.core.model.AudioFrame
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import javax.sound.sampled.*
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import javax.sound.sampled.AudioFormat
+import javax.sound.sampled.AudioSystem
+import javax.sound.sampled.DataLine
+import javax.sound.sampled.TargetDataLine
 
 class DesktopAudioRecorder : AudioRecorder {
-    private val _samples = MutableSharedFlow<AudioFrame>()
-    override val samples: Flow<AudioFrame> = _samples
+    private val _samples = MutableSharedFlow<AudioFrame>(extraBufferCapacity = 64)
+    override val samples: SharedFlow<AudioFrame> = _samples.asSharedFlow()
     
+    private var job: Job? = null
     private var line: TargetDataLine? = null
-    private var recordingJob: Job? = null
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     override suspend fun start() {
-        if (line != null) return
-
+        if (job != null) return
+        
         val format = AudioFormat(48000f, 16, 1, true, false)
         val info = DataLine.Info(TargetDataLine::class.java, format)
         
         if (!AudioSystem.isLineSupported(info)) {
-            return
+            throw IllegalStateException("Line not supported")
         }
-
+        
         line = AudioSystem.getLine(info) as TargetDataLine
         line?.open(format)
         line?.start()
-
-        recordingJob = scope.launch {
-            val buffer = ByteArray(2048)
-            while (isActive && line?.isOpen == true) {
+        
+        job = scope.launch {
+            val buffer = ByteArray(2048) // 1024 samples
+            val floatBuffer = FloatArray(1024)
+            while (isActive) {
                 val read = line?.read(buffer, 0, buffer.size) ?: -1
                 if (read > 0) {
-                    val floats = FloatArray(read / 2)
                     val bb = ByteBuffer.wrap(buffer, 0, read).order(ByteOrder.LITTLE_ENDIAN)
-                    for (i in floats.indices) {
-                        floats[i] = bb.short.toFloat() / Short.MAX_VALUE
+                    for (i in 0 until read / 2) {
+                        floatBuffer[i] = bb.short / 32768f
                     }
-                    _samples.emit(
-                        AudioFrame(
-                            samples = floats,
-                            sampleRate = format.sampleRate.toInt(),
-                            channels = format.channels,
-                            timestamp = System.currentTimeMillis()
-                        )
+                    val frame = AudioFrame(
+                        samples = floatBuffer.copyOf(read / 2),
+                        sampleRate = 48000,
+                        channels = 1,
+                        timestamp = System.currentTimeMillis()
                     )
+                    _samples.emit(frame)
                 }
             }
         }
     }
 
     override suspend fun stop() {
-        recordingJob?.cancelAndJoin()
-        recordingJob = null
-        
+        job?.cancelAndJoin()
+        job = null
         line?.stop()
         line?.close()
         line = null
     }
 }
+
+actual fun createAudioRecorder(): AudioRecorder = DesktopAudioRecorder()

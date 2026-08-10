@@ -1,20 +1,17 @@
 package com.whisper.audio
 
 class DesktopAudioEngine : AudioEngine {
-    override val recorder: AudioRecorder = DesktopAudioRecorder()
-    override val player: AudioPlayer = DesktopAudioPlayer()
+    override val recorder: AudioRecorder = createAudioRecorder()
+    override val player: AudioPlayer = createAudioPlayer()
 
     override suspend fun setup() {
-        // TODO: Initialize target data line and source data line
+        // Resources are lazily initialized in recorder/player or during start/play
     }
 
     override suspend fun release() {
-        // TODO: Release resources
+        recorder.stop()
+        player.stop()
     }
 }
 
 actual fun createAudioEngine(): AudioEngine = DesktopAudioEngine()
-
-actual fun createAudioPlayer(): AudioPlayer = DesktopAudioPlayer()
-
-actual fun createAudioRecorder(): AudioRecorder = DesktopAudioRecorder()
