@@ -13,15 +13,15 @@ kotlin {
         minSdk = 29
     }
     
-//    jvm("desktop")
-//
-//    linuxX64()
-//    macosX64()
-//    macosArm64()
-//
-//    iosX64()
-//    iosArm64()
-//    iosSimulatorArm64()
+    jvm("desktop")
+
+    linuxX64()
+    macosX64()
+    macosArm64()
+
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
     
 //    mingwX64()
 

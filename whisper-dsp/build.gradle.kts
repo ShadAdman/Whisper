@@ -110,6 +110,12 @@ kotlin {
         
         val nativeMain by getting
 
+        val desktopMain by getting {
+            dependencies {
+                implementation(libs.jna)
+            }
+        }
+
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
