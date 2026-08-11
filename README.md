@@ -65,7 +65,9 @@ The `Whisper` object serves as the primary entry point for the library. You can 
 val config = WhisperConfig(
     sampleRate = 48000,
     carrierFrequency = 19000f,
-    fecConfig = FecConfig(enabled = true, redundancy = 2)
+    fecConfig = FecConfig(enabled = true, redundancy = 2),
+    encryptionKey = "your-16-byte-key".encodeToByteArray(),
+    encryptor = AesEncryptor()
 )
 
 Whisper.configure(config)
@@ -78,6 +80,8 @@ The `WhisperConfig` class accepts the following parameters:
 - **fecConfig**: This parameter handles the Forward Error Correction settings through the `FecConfig` class:
     - **enabled**: A boolean that determines whether error correction logic should be applied to the transmitted data.
     - **redundancy**: An integer that defines the level of data duplication. A higher value improves the chances of successful data recovery in environments with significant background noise, though it will increase the total time required for transmission.
+- **encryptionKey**: (Optional) A `ByteArray` representing the secret key for encryption. When provided, Whisper will automatically encrypt/decrypt all transmitted and received data payloads.
+- **encryptor**: (Optional) A `WhisperEncryptor` implementation. By default, it uses `SimpleXorEncryptor`. For production, `AesEncryptor()` is recommended as it uses platform-native hardware acceleration for secure communication.
 
 ### Receiving Data
 
@@ -154,6 +158,7 @@ You can run the sample app on Android, iOS, or Desktop to test the protocol betw
 Whisper is organized into several modules to maintain a clear separation of concerns:
 
 - **whisper**: The high-level API for application developers.
+- **whisper-crypto**: Secure encryption layer (AES, XOR) for data payloads.
 - **whisper-core**: Core data models and packet definitions.
 - **whisper-dsp**: Digital signal processing logic, including filters and modems.
 - **whisper-audio**: Platform-specific audio recording and playback implementations.
@@ -186,8 +191,10 @@ Multipath interference is a common challenge in acoustic communication. Whisper'
 ### What if a user has pet?
 Pets such as dogs or cats can hear high-frequency sounds. While Whisper operates near the edge of human hearing, animals might hear a very faint 'whistle' or 'static'. We recommend providing a toggle in your app to disable acoustic features for accessibility.
 
-## Security Note
+## Security
 
-Whisper is designed for local, proximity-based communication. While it is decentralized by nature, users should implement their own encryption layers if they are transmitting sensitive information, as acoustic signals can be recorded by any nearby device with a microphone.
+Whisper provides built-in support for securing data payloads via the `whisper-crypto` module. By default, it supports:
+- **AES (CBC with PKCS7 Padding)**: Uses platform-native hardware acceleration via `AesEncryptor()`.
+- **Custom Encryptors**: Implement the `WhisperEncryptor` interface to use your own cryptographic algorithms.
 
-Support for manual encryption within the protocol is currently on the way, which will provide built-in hooks for securing the data payload before transmission.
+While Whisper provides these tools, it is still proximity-based and operates over acoustic waves. Users should be aware that encrypted acoustic signals can still be recorded by nearby microphones, even if they cannot be easily decrypted.

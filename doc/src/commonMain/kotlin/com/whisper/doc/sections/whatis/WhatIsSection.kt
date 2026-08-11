@@ -90,6 +90,16 @@ fun WhatIsSection() {
             fontSize = 18.sp,
             lineHeight = 28.sp
         )
+
+        Spacer(modifier = Modifier.height(48.dp))
+
+        SectionHeader("5. Secure Payload")
+        Text(
+            text = "Whisper includes a built-in cryptographic layer through the whisper-crypto module. It provides platform-native AES encryption to ensure that even if someone records the acoustic signal, they cannot access the underlying data without the secret key.",
+            style = MaterialTheme.typography.bodyMedium,
+            fontSize = 18.sp,
+            lineHeight = 28.sp
+        )
         
         Spacer(modifier = Modifier.height(64.dp))
     }

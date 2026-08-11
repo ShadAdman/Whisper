@@ -56,6 +56,11 @@ fun WhatIfSection() {
             answer = "Pets such as dogs or cats can hear high-frequency sounds. While Whisper operates near the edge of human hearing, animals might hear a very faint 'whistle' or 'static'. We recommend providing a toggle in your app to disable acoustic features for accessibility."
         )
 
+        QAItem(
+            question = "What if someone records the audio?",
+            answer = "Since Whisper uses acoustic waves, anyone nearby with a microphone can technically record the transmission. This is why we've introduced the whisper-crypto module. By enabling AES encryption in your configuration, the recorded audio will be useless to an attacker without the corresponding 128/256-bit secret key."
+        )
+
         Spacer(modifier = Modifier.height(64.dp))
     }
 }
