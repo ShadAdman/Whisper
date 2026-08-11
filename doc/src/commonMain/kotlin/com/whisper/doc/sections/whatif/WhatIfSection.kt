@@ -51,6 +51,11 @@ fun WhatIfSection() {
             answer = "Multipath interference is a common challenge in acoustic communication. Whisper's FSK modem includes guard intervals between symbols to allow echoes to die down before the next bit is processed, ensuring the decoder doesn't get confused by reflected waves."
         )
 
+        QAItem(
+            question = "What if a user has pet?",
+            answer = "Pets such as dogs or cats can hear high-frequency sounds. While Whisper operates near the edge of human hearing, animals might hear a very faint 'whistle' or 'static'. We recommend providing a toggle in your app to disable acoustic features for accessibility."
+        )
+
         Spacer(modifier = Modifier.height(64.dp))
     }
 }

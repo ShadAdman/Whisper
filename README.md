@@ -162,8 +162,8 @@ Whisper is organized into several modules to maintain a clear separation of conc
 ## Requirements
 
 - **Android**: API Level 29 or higher.
-- **iOS**: (On the way) iOS 14.0 or higher.
-- **Desktop**: (On the way) support for Linux, macOS, and Windows.
+- **iOS**: iOS 14.0 or higher.
+- **Desktop**: support for Linux, macOS, and Windows.
 - **Web**: (On the way) support via Kotlin/Wasm.
 
 ## Troubleshooting & Edge Cases
@@ -182,6 +182,9 @@ Some hearing aids can amplify high-frequency sounds. While Whisper operates near
 
 ### What if the signal reflects off walls?
 Multipath interference is a common challenge in acoustic communication. Whisper's FSK modem includes guard intervals between symbols to allow echoes to die down before the next bit is processed, ensuring the decoder doesn't get confused by reflected waves.
+
+### What if a user has pet?
+Pets such as dogs or cats can hear high-frequency sounds. While Whisper operates near the edge of human hearing, animals might hear a very faint 'whistle' or 'static'. We recommend providing a toggle in your app to disable acoustic features for accessibility.
 
 ## Security Note
 
