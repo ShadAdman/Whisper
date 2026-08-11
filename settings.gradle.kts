@@ -28,6 +28,7 @@ dependencyResolutionManagement {
 }
 
 include(":whisper-core")
+include(":whisper-crypto")
 include(":whisper-dsp")
 include(":whisper-audio")
 include(":whisper")
