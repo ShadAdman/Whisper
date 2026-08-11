@@ -1,5 +1,6 @@
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import org.gradle.plugins.signing.SigningExtension
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     // this is necessary to avoid the plugins to be loaded multiple times
@@ -16,6 +17,12 @@ plugins {
 }
 
 subprojects {
+    tasks.withType<KotlinCompile>().configureEach {
+        kotlinOptions {
+            jvmTarget = "17"
+        }
+    }
+
     pluginManager.withPlugin("com.vanniktech.maven.publish") {
         val props = project.providers
         val artifactIdProp = props.gradleProperty("POM_ARTIFACT_ID").orNull

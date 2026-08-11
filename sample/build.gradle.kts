@@ -82,3 +82,7 @@ compose.desktop {
         }
     }
 }
+
+tasks.register("desktopRun") {
+    dependsOn("run")
+}
