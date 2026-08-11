@@ -28,7 +28,7 @@ fun WhatIfSection() {
 
         QAItem(
             question = "What if there is loud background noise?",
-            answer = "Whisper uses a bandpass filter to ignore frequencies outside the 18-22 kHz range. Most environmental noise (talking, music, traffic) is below 15 kHz. However, extremely loud metallic noises or specialized ultrasound jammers can cause interference. In these cases, increasing the FEC redundancy is recommended."
+            answer = "Whisper uses the industrial-grade filtering capabilities of Liquid DSP (github.com/jgaeddert/liquid-dsp) to ignore frequencies outside the 18-22 kHz range. Most environmental noise (talking, music, traffic) is below 15 kHz. The high-order filters provided by Liquid DSP allow us to maintain a clean signal even in challenging environments. If noise is extreme, increasing FEC redundancy is also recommended."
         )
 
         QAItem(

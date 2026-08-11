@@ -44,11 +44,13 @@ Acoustic communication uses sound waves to transmit information. Whisper operate
 ### FSK Modulation
 Whisper uses Frequency Shift Keying (FSK) to represent data. In FSK, different frequencies are assigned to represent specific bit values. For example, one frequency might represent a binary 0, while another represents a binary 1. By switching between these frequencies over time, the protocol can encode a stream of data into a sound signal.
 
-### DSP Pipeline
-Digital Signal Processing (DSP) is used to clean and prepare the audio signal before it is analyzed. Whisper employs a pipeline that includes:
+### DSP Pipeline (Powered by [Liquid DSP](https://github.com/jgaeddert/liquid-dsp))
+Digital Signal Processing (DSP) is used to clean and prepare the audio signal before it is analyzed. Whisper leverages **[Liquid DSP](https://github.com/jgaeddert/liquid-dsp)**, a comprehensive and highly optimized software-defined radio (SDR) library. This allows us to employ a sophisticated pipeline that includes:
 - **Windowing**: Breaking the continuous audio stream into manageable segments for analysis.
 - **Bandpass Filtering**: Removing noise from frequencies outside the communication range (e.g., background speech or music).
 - **Gain Control**: Normalizing the volume of the signal to ensure consistent detection.
+
+By using [Liquid DSP](https://github.com/jgaeddert/liquid-dsp) as our engine, Whisper gains access to advanced modem designs, robust synchronization algorithms, and efficient filtering techniques that would be impractical to implement from scratch. This architectural choice ensures that Whisper is built on a battle-tested foundation, ready for future enhancements like higher-order modulations (PSK, QAM) or advanced channel equalization.
 
 ### Forward Error Correction (FEC)
 Sound is an unstable medium for data transfer due to background noise and physical obstructions. Whisper includes Forward Error Correction to improve reliability. By sending redundant information along with the actual data, the receiving device can reconstruct the original message even if some parts of the acoustic signal were corrupted or lost.
@@ -153,9 +155,14 @@ Features of the sample app include:
 
 You can run the sample app on Android, iOS, or Desktop to test the protocol between multiple devices.
 
-## Module Structure
+## Technology Stack
 
-Whisper is organized into several modules to maintain a clear separation of concerns:
+Whisper is built on a modern, high-performance stack:
+- **Kotlin Multiplatform**: For shared business logic and API surfaces across Android, iOS, Desktop, and Web.
+- **[Liquid DSP](https://github.com/jgaeddert/liquid-dsp)**: A world-class C library for software-defined radio, providing the heavy-lifting for FSK modulation, synchronization, and error correction.
+- **Compose Multiplatform**: Powering the documentation and sample applications.
+
+While [Liquid DSP](https://github.com/jgaeddert/liquid-dsp) is a comprehensive library, its inclusion provides Whisper with a significant "future-proof" advantage. It allows us to rapidly evolve the protocol—moving from simple FSK to more complex waveforms or adding sophisticated adaptive filtering—without changing our core engine.
 
 - **whisper**: The high-level API for application developers.
 - **whisper-crypto**: Secure encryption layer (AES, XOR) for data payloads.

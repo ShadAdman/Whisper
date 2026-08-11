@@ -83,7 +83,20 @@ fun WhatIsSection() {
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        SectionHeader("4. Reliability & FEC")
+        SectionHeader("4. Powered by Liquid DSP")
+        Text(
+            text = "Whisper's engine is built upon Liquid DSP (github.com/jgaeddert/liquid-dsp), a powerful, open-source software-defined radio library. While it is a comprehensive suite, we chose it specifically for its performance and future-readiness. Using Liquid DSP allows Whisper to:\n\n" +
+                 "• Leverage Industrial-Grade Filters: Achieving sharp frequency separation that keeps the signal clear in noisy environments.\n" +
+                 "• Rapidly Evolve: We can easily add support for advanced modulations like PSK or OFDM in future updates.\n" +
+                 "• Cross-Platform Performance: The C-based core ensures consistent, high-speed processing across Android, iOS, and Desktop.",
+            style = MaterialTheme.typography.bodyMedium,
+            fontSize = 18.sp,
+            lineHeight = 28.sp
+        )
+
+        Spacer(modifier = Modifier.height(48.dp))
+
+        SectionHeader("5. Reliability & FEC")
         Text(
             text = "Sound reflects off walls and is absorbed by objects. Whisper uses Forward Error Correction (FEC) to ensure data integrity. By adding mathematical redundancy, the receiver can reconstruct the original message even if parts of the sound signal were corrupted by a loud noise.",
             style = MaterialTheme.typography.bodyMedium,
@@ -93,7 +106,7 @@ fun WhatIsSection() {
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        SectionHeader("5. Secure Payload")
+        SectionHeader("6. Secure Payload")
         Text(
             text = "Whisper includes a built-in cryptographic layer through the whisper-crypto module. It provides platform-native AES encryption to ensure that even if someone records the acoustic signal, they cannot access the underlying data without the secret key.",
             style = MaterialTheme.typography.bodyMedium,
