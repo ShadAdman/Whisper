@@ -11,7 +11,6 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.composeMultiplatform) apply false
     alias(libs.plugins.compose.compiler) apply false
-    alias(libs.plugins.kmmbridge) apply false
     alias(libs.plugins.vanniktechPublish) apply false
     id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
 }

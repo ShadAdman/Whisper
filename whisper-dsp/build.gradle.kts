@@ -3,7 +3,6 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
-    alias(libs.plugins.kmmbridge)
     `maven-publish`
 }
 
@@ -119,11 +118,5 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
-    }
-
-    kmmbridge {
-        frameworkName.set("WhisperDSP")
-        mavenPublishArtifacts()
-        spm()
     }
 }
