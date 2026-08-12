@@ -1,6 +1,3 @@
 package = liquid
 headers = liquid.h
 headerFilter = liquid.h
-
-compilerOpts = -Iwhisper-dsp/prebuilt/desktop/macos/include
-linkerOpts = -Lwhisper-dsp/prebuilt/desktop/macos/lib -lliquid

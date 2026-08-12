@@ -1,6 +1,3 @@
 package = liquid
 headers = liquid.h
 headerFilter = liquid.h
-
-compilerOpts = -Iwhisper-dsp/prebuilt/desktop/linux/include
-linkerOpts = -Lwhisper-dsp/prebuilt/desktop/linux/lib -lliquid

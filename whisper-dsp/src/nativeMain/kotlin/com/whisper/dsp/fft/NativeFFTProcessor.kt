@@ -8,7 +8,7 @@ import kotlinx.cinterop.*
 class NativeFFTProcessor(private val fftSize: Int) : FFTProcessor {
     private val input = nativeHeap.allocArray<FloatVar>(fftSize * 2)
     private val output = nativeHeap.allocArray<FloatVar>(fftSize * 2)
-    private val plan = fft_create_plan(fftSize.toUInt(), input.reinterpret(), output.reinterpret(), -1, 0)!!
+    private val plan = fft_create_plan(fftSize.toUInt(), input, output, -1, 0)!!
 
     override fun process(samples: FloatArray, sampleRate: Float): FrequencySpectrum {
         for (i in 0 until fftSize) {
