@@ -20,28 +20,30 @@ class AppleAudioRecorder : AudioRecorder {
         val format = inputNode.inputFormatForBus(0u)
 
         inputNode.installTapOnBus(0u, 1024u, format) { buffer, _ ->
-            buffer?.let {
-                val frameCount = it.frameLength.toInt()
-                val floatData = it.floatChannelData?.get(0) ?: return@let
-                
-                val samples = FloatArray(frameCount)
-                for (i in 0 until frameCount) {
-                    samples[i] = floatData[i]
-                }
-                _samples.tryEmit(
-                    AudioFrame(
-                        samples = samples,
-                        sampleRate = format.sampleRate.toInt(),
-                        channels = format.channelCount.toInt(),
-                        timestamp = NSDate().timeIntervalSince1970.toLong() * 1000
+            if (buffer != null) {
+                val frameCount = buffer.frameLength.toInt()
+                val channelData = buffer.floatChannelData
+                if (channelData != null) {
+                    val floatData: CPointer<FloatVar> = channelData[0]!!
+                    val samples = FloatArray(frameCount)
+                    for (i in 0 until frameCount) {
+                        samples[i] = floatData[i]
+                    }
+                    _samples.tryEmit(
+                        AudioFrame(
+                            samples = samples,
+                            sampleRate = format.sampleRate.toInt(),
+                            channels = format.channelCount.toInt(),
+                            timestamp = NSDate().timeIntervalSince1970.toLong() * 1000
+                        )
                     )
-                )
+                }
             }
         }
 
         audioEngine.prepare()
         memScoped {
-            val errorVar = alloc<ObjCHandleVar>()
+            val errorVar = alloc<ObjCObjectVar<NSError?>>()
             audioEngine.startAndReturnError(errorVar.ptr)
         }
     }

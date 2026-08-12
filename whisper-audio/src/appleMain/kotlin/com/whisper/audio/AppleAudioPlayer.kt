@@ -5,6 +5,7 @@ import kotlinx.cinterop.*
 import platform.AVFoundation.*
 import platform.Foundation.*
 
+@OptIn(ExperimentalForeignApi::class)
 class AppleAudioPlayer : AudioPlayer {
     private val audioEngine = AVAudioEngine()
     private val playerNode = AVAudioPlayerNode()
@@ -23,7 +24,7 @@ class AppleAudioPlayer : AudioPlayer {
         
         audioEngine.prepare()
         memScoped {
-            val errorVar = alloc<ObjCHandleVar>()
+            val errorVar = alloc<ObjCObjectVar<NSError?>>()
             audioEngine.startAndReturnError(errorVar.ptr)
         }
 
@@ -33,9 +34,12 @@ class AppleAudioPlayer : AudioPlayer {
         ) ?: return
         
         pcmBuffer.frameLength = frame.samples.size.toUInt()
-        val data = pcmBuffer.floatChannelData?.get(0) ?: return
-        for (i in frame.samples.indices) {
-            data[i] = frame.samples[i]
+        val channelData = pcmBuffer.floatChannelData
+        if (channelData != null) {
+            val data: CPointer<FloatVar> = channelData[0]!!
+            for (i in frame.samples.indices) {
+                data[i] = frame.samples[i]
+            }
         }
 
         playerNode.scheduleBuffer(pcmBuffer, atTime = null, options = 0u, completionHandler = null)

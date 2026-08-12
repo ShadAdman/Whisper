@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
@@ -25,25 +27,36 @@ kotlin {
     linuxX64()
     macosX64()
     macosArm64()
-
     iosX64()
     iosArm64()
     iosSimulatorArm64()
-    
-//    mingwX64()
+
+    targets.withType<KotlinNativeTarget> {
+        if (konanTarget.family.isAppleFamily) {
+            compilations.getByName("main") {
+                compilerOptions.options.freeCompilerArgs.add("-Xlinker-options -framework AVFoundation -framework AudioToolbox")
+            }
+        }
+    }
 
     sourceSets {
-        commonMain.dependencies {
-            implementation(project(":whisper-core"))
-            implementation(libs.kotlinx.coroutines.core)
-            implementation(libs.kotlinx.datetime)
+        val commonMain by getting {
+            dependencies {
+                implementation(project(":whisper-core"))
+                implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.kotlinx.datetime)
+            }
+        }
+        val appleMain by getting {
+            dependsOn(commonMain)
+        }
+        val androidMain by getting {
+            dependencies {
+                implementation(libs.androidx.startup)
+            }
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
-        }
-
-        androidMain.dependencies {
-            implementation(libs.androidx.startup)
         }
     }
 }
