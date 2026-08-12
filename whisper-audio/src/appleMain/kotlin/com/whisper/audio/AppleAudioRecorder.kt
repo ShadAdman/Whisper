@@ -24,19 +24,21 @@ class AppleAudioRecorder : AudioRecorder {
                 val frameCount = buffer.frameLength.toInt()
                 val channelData = buffer.floatChannelData
                 if (channelData != null) {
-                    val floatData: CPointer<FloatVar> = channelData[0]!!
-                    val samples = FloatArray(frameCount)
-                    for (i in 0 until frameCount) {
-                        samples[i] = floatData[i]
-                    }
-                    _samples.tryEmit(
-                        AudioFrame(
-                            samples = samples,
-                            sampleRate = format.sampleRate.toInt(),
-                            channels = format.channelCount.toInt(),
-                            timestamp = NSDate().timeIntervalSince1970.toLong() * 1000
+                    val floatData = channelData[0]
+                    if (floatData != null) {
+                        val samples = FloatArray(frameCount)
+                        for (i in 0 until frameCount) {
+                            samples[i] = floatData[i]
+                        }
+                        _samples.tryEmit(
+                            AudioFrame(
+                                samples = samples,
+                                sampleRate = format.sampleRate.toInt(),
+                                channels = format.channelCount.toInt(),
+                                timestamp = (NSDate().timeIntervalSince1970 * 1000).toLong()
+                            )
                         )
-                    )
+                    }
                 }
             }
         }

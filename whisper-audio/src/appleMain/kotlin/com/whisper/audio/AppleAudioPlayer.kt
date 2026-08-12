@@ -36,9 +36,11 @@ class AppleAudioPlayer : AudioPlayer {
         pcmBuffer.frameLength = frame.samples.size.toUInt()
         val channelData = pcmBuffer.floatChannelData
         if (channelData != null) {
-            val data: CPointer<FloatVar> = channelData[0]!!
-            for (i in frame.samples.indices) {
-                data[i] = frame.samples[i]
+            val data = channelData[0]
+            if (data != null) {
+                for (i in 0 until frame.samples.size) {
+                    data[i] = frame.samples[i]
+                }
             }
         }
 

@@ -31,15 +31,10 @@ kotlin {
     iosArm64()
     iosSimulatorArm64()
 
-    targets.withType<KotlinNativeTarget> {
-        if (konanTarget.family.isAppleFamily) {
-            compilations.getByName("main") {
-                compilerOptions.options.freeCompilerArgs.add("-Xlinker-options -framework AVFoundation -framework AudioToolbox")
-            }
-        }
-    }
-
     sourceSets {
+        all {
+            languageSettings.optIn("kotlinx.cinterop.ExperimentalForeignApi")
+        }
         val commonMain by getting {
             dependencies {
                 implementation(project(":whisper-core"))
