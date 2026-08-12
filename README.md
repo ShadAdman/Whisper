@@ -44,11 +44,13 @@ Acoustic communication uses sound waves to transmit information. Whisper operate
 ### FSK Modulation
 Whisper uses Frequency Shift Keying (FSK) to represent data. In FSK, different frequencies are assigned to represent specific bit values. For example, one frequency might represent a binary 0, while another represents a binary 1. By switching between these frequencies over time, the protocol can encode a stream of data into a sound signal.
 
-### DSP Pipeline
-Digital Signal Processing (DSP) is used to clean and prepare the audio signal before it is analyzed. Whisper employs a pipeline that includes:
+### DSP Pipeline (Powered by [Liquid DSP](https://github.com/jgaeddert/liquid-dsp))
+Digital Signal Processing (DSP) is used to clean and prepare the audio signal before it is analyzed. Whisper leverages **[Liquid DSP](https://github.com/jgaeddert/liquid-dsp)**, a comprehensive and highly optimized software-defined radio (SDR) library. This allows us to employ a sophisticated pipeline that includes:
 - **Windowing**: Breaking the continuous audio stream into manageable segments for analysis.
 - **Bandpass Filtering**: Removing noise from frequencies outside the communication range (e.g., background speech or music).
 - **Gain Control**: Normalizing the volume of the signal to ensure consistent detection.
+
+By using [Liquid DSP](https://github.com/jgaeddert/liquid-dsp) as our engine, Whisper gains access to advanced modem designs, robust synchronization algorithms, and efficient filtering techniques that would be impractical to implement from scratch. This architectural choice ensures that Whisper is built on a battle-tested foundation, ready for future enhancements like higher-order modulations (PSK, QAM) or advanced channel equalization.
 
 ### Forward Error Correction (FEC)
 Sound is an unstable medium for data transfer due to background noise and physical obstructions. Whisper includes Forward Error Correction to improve reliability. By sending redundant information along with the actual data, the receiving device can reconstruct the original message even if some parts of the acoustic signal were corrupted or lost.
@@ -65,7 +67,9 @@ The `Whisper` object serves as the primary entry point for the library. You can 
 val config = WhisperConfig(
     sampleRate = 48000,
     carrierFrequency = 19000f,
-    fecConfig = FecConfig(enabled = true, redundancy = 2)
+    fecConfig = FecConfig(enabled = true, redundancy = 2),
+    encryptionKey = "your-16-byte-key".encodeToByteArray(),
+    encryptor = AesEncryptor()
 )
 
 Whisper.configure(config)
@@ -78,6 +82,8 @@ The `WhisperConfig` class accepts the following parameters:
 - **fecConfig**: This parameter handles the Forward Error Correction settings through the `FecConfig` class:
     - **enabled**: A boolean that determines whether error correction logic should be applied to the transmitted data.
     - **redundancy**: An integer that defines the level of data duplication. A higher value improves the chances of successful data recovery in environments with significant background noise, though it will increase the total time required for transmission.
+- **encryptionKey**: (Optional) A `ByteArray` representing the secret key for encryption. When provided, Whisper will automatically encrypt/decrypt all transmitted and received data payloads.
+- **encryptor**: (Optional) A `WhisperEncryptor` implementation. By default, it uses `SimpleXorEncryptor`. For production, `AesEncryptor()` is recommended as it uses platform-native hardware acceleration for secure communication.
 
 ### Receiving Data
 
@@ -149,11 +155,17 @@ Features of the sample app include:
 
 You can run the sample app on Android, iOS, or Desktop to test the protocol between multiple devices.
 
-## Module Structure
+## Technology Stack
 
-Whisper is organized into several modules to maintain a clear separation of concerns:
+Whisper is built on a modern, high-performance stack:
+- **Kotlin Multiplatform**: For shared business logic and API surfaces across Android, iOS, Desktop, and Web.
+- **[Liquid DSP](https://github.com/jgaeddert/liquid-dsp)**: A world-class C library for software-defined radio, providing the heavy-lifting for FSK modulation, synchronization, and error correction.
+- **Compose Multiplatform**: Powering the documentation and sample applications.
+
+While [Liquid DSP](https://github.com/jgaeddert/liquid-dsp) is a comprehensive library, its inclusion provides Whisper with a significant "future-proof" advantage. It allows us to rapidly evolve the protocol—moving from simple FSK to more complex waveforms or adding sophisticated adaptive filtering—without changing our core engine.
 
 - **whisper**: The high-level API for application developers.
+- **whisper-crypto**: Secure encryption layer (AES, XOR) for data payloads.
 - **whisper-core**: Core data models and packet definitions.
 - **whisper-dsp**: Digital signal processing logic, including filters and modems.
 - **whisper-audio**: Platform-specific audio recording and playback implementations.
@@ -162,9 +174,10 @@ Whisper is organized into several modules to maintain a clear separation of conc
 ## Requirements
 
 - **Android**: API Level 29 or higher.
-- **iOS**: (On the way) iOS 14.0 or higher.
-- **Desktop**: (On the way) support for Linux, macOS, and Windows.
+- **iOS**: iOS 14.0 or higher.
+- **Desktop**: support for Linux, macOS, and Windows.
 - **Web**: (On the way) support via Kotlin/Wasm.
+- **Native**:(On the way) support for embedded devices.
 
 ## Troubleshooting & Edge Cases
 
@@ -183,8 +196,13 @@ Some hearing aids can amplify high-frequency sounds. While Whisper operates near
 ### What if the signal reflects off walls?
 Multipath interference is a common challenge in acoustic communication. Whisper's FSK modem includes guard intervals between symbols to allow echoes to die down before the next bit is processed, ensuring the decoder doesn't get confused by reflected waves.
 
-## Security Note
+### What if a user has pet?
+Pets such as dogs or cats can hear high-frequency sounds. While Whisper operates near the edge of human hearing, animals might hear a very faint 'whistle' or 'static'. We recommend providing a toggle in your app to disable acoustic features for accessibility.
 
-Whisper is designed for local, proximity-based communication. While it is decentralized by nature, users should implement their own encryption layers if they are transmitting sensitive information, as acoustic signals can be recorded by any nearby device with a microphone.
+## Security
 
-Support for manual encryption within the protocol is currently on the way, which will provide built-in hooks for securing the data payload before transmission.
+Whisper provides built-in support for securing data payloads via the `whisper-crypto` module. By default, it supports:
+- **AES (CBC with PKCS7 Padding)**: Uses platform-native hardware acceleration via `AesEncryptor()`.
+- **Custom Encryptors**: Implement the `WhisperEncryptor` interface to use your own cryptographic algorithms.
+
+While Whisper provides these tools, it is still proximity-based and operates over acoustic waves. Users should be aware that encrypted acoustic signals can still be recorded by nearby microphones, even if they cannot be easily decrypted.

@@ -91,7 +91,14 @@ object Whisper {
         .filterIsInstance<ValidPacket>()
         .map { it.packet }
 
-    val receivedData: Flow<ByteArray> = receivedPackets.map { it.payload }
+    val receivedData: Flow<ByteArray> = receivedPackets.map { packet ->
+        val key = config.encryptionKey
+        if (key != null) {
+            config.encryptor.decrypt(packet.payload, key)
+        } else {
+            packet.payload
+        }
+    }
 
     val carrierEvents: Flow<CarrierEvent> = flow {
         val carrierDetector = CarrierDetector()
@@ -166,7 +173,15 @@ object Whisper {
 
     suspend fun transmit(data: ByteArray) = playerMutex.withLock {
         val currentEngine = getOrInitializeEngine()
-        val packet = WhisperPacket(payload = data)
+        
+        val key = config.encryptionKey
+        val finalData = if (key != null) {
+            config.encryptor.encrypt(data, key)
+        } else {
+            data
+        }
+        
+        val packet = WhisperPacket(payload = finalData)
         val packetEncoder = DefaultPacketEncoder()
         val encodedPacket = packetEncoder.encode(packet, config.fecConfig)
         

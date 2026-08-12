@@ -75,6 +75,20 @@ fun HowToSection() {
 
         StepCard(
             number = "4",
+            title = "Security & Encryption",
+            description = "To secure your data, provide an encryptionKey and an AesEncryptor in your config. Whisper will automatically handle encryption for transmission and decryption upon reception.",
+            code = "Whisper.configure(\n" +
+                   "    WhisperConfig(\n" +
+                   "        encryptionKey = \"secret-16-bytes-\".encodeToByteArray(),\n" +
+                   "        encryptor = AesEncryptor()\n" +
+                   "    )\n" +
+                   ")"
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        StepCard(
+            number = "5",
             title = "Monitoring Events",
             description = "Observe the carrierEvents flow to detect when a transmitter is nearby, even if data isn't being sent yet.",
             code = "Whisper.carrierEvents.collect { event ->\n" +

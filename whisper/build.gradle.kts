@@ -28,6 +28,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(project(":whisper-core"))
+            api(project(":whisper-crypto"))
             implementation(project(":whisper-dsp"))
             api(project(":whisper-audio"))
             implementation(libs.kotlinx.coroutines.core)
