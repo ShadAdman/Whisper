@@ -177,6 +177,7 @@ While [Liquid DSP](https://github.com/jgaeddert/liquid-dsp) is a comprehensive l
 - **iOS**: iOS 14.0 or higher.
 - **Desktop**: support for Linux, macOS, and Windows.
 - **Web**: (On the way) support via Kotlin/Wasm.
+- **Native**:(On the way) support for embedded devices.
 
 ## Troubleshooting & Edge Cases
 
