@@ -30,66 +30,105 @@ kotlin {
     
     jvm("desktop")
 
-//    linuxX64 {
-//        compilations.getByName("main") {
-//            cinterops.create("liquid") {
-//                definitionFile.set(project.file("src/nativeInterop/cinterop/liquid_linux.def"))
-//            }
-//        }
-//    }
-//
-//    macosX64 {
-//        compilations.getByName("main") {
-//            cinterops.create("liquid") {
-//                definitionFile.set(project.file("src/nativeInterop/cinterop/liquid_macos.def"))
-//            }
-//        }
-//        binaries.framework {
-//            baseName = "WhisperDSP"
-//        }
-//    }
-//
-//    macosArm64 {
-//        compilations.getByName("main") {
-//            cinterops.create("liquid") {
-//                definitionFile.set(project.file("src/nativeInterop/cinterop/liquid_macos.def"))
-//            }
-//        }
-//        binaries.framework {
-//            baseName = "WhisperDSP"
-//        }
-//    }
-//
-//    iosX64 {
-//        compilations.getByName("main") {
-//            cinterops.create("liquid") {
-//                definitionFile.set(project.file("src/nativeInterop/cinterop/liquid_ios.def"))
-//            }
-//        }
-//        binaries.framework {
-//            baseName = "WhisperDSP"
-//        }
-//    }
-//    iosArm64 {
-//        compilations.getByName("main") {
-//            cinterops.create("liquid") {
-//                definitionFile.set(project.file("src/nativeInterop/cinterop/liquid_ios.def"))
-//            }
-//        }
-//        binaries.framework {
-//            baseName = "WhisperDSP"
-//        }
-//    }
-//    iosSimulatorArm64 {
-//        compilations.getByName("main") {
-//            cinterops.create("liquid") {
-//                definitionFile.set(project.file("src/nativeInterop/cinterop/liquid_ios.def"))
-//            }
-//        }
-//        binaries.framework {
-//            baseName = "WhisperDSP"
-//        }
-//    }
+    linuxX64 {
+        compilations.getByName("main") {
+            cinterops.create("liquid") {
+                definitionFile.set(project.file("src/nativeInterop/cinterop/liquid_linux.def"))
+                includeDirs(file("prebuilt/desktop/linux/include"))
+            }
+        }
+        binaries {
+            sharedLib {
+                baseName = "WhisperDSP"
+            }
+            all {
+                linkerOpts("-L${project.file("prebuilt/desktop/linux/lib").absolutePath}", "-lliquid")
+            }
+        }
+    }
+
+    macosX64 {
+        compilations.getByName("main") {
+            cinterops.create("liquid") {
+                definitionFile.set(project.file("src/nativeInterop/cinterop/liquid_macos.def"))
+                includeDirs(file("prebuilt/desktop/macos/include"))
+            }
+        }
+        binaries {
+            framework {
+                baseName = "WhisperDSP"
+            }
+            all {
+                linkerOpts("-L${project.file("prebuilt/desktop/macos/lib").absolutePath}", "-lliquid")
+            }
+        }
+    }
+
+    macosArm64 {
+        compilations.getByName("main") {
+            cinterops.create("liquid") {
+                definitionFile.set(project.file("src/nativeInterop/cinterop/liquid_macos.def"))
+                includeDirs(file("prebuilt/desktop/macos/include"))
+            }
+        }
+        binaries {
+            framework {
+                baseName = "WhisperDSP"
+            }
+            all {
+                linkerOpts("-L${project.file("prebuilt/desktop/macos/lib").absolutePath}", "-lliquid")
+            }
+        }
+    }
+
+    iosX64 {
+        compilations.getByName("main") {
+            cinterops.create("liquid") {
+                definitionFile.set(project.file("src/nativeInterop/cinterop/liquid_ios.def"))
+                includeDirs(file("prebuilt/ios/include"))
+            }
+        }
+        binaries {
+            framework {
+                baseName = "WhisperDSP"
+            }
+            all {
+                linkerOpts("-L${project.file("prebuilt/ios/lib").absolutePath}", "-lliquid")
+            }
+        }
+    }
+    iosArm64 {
+        compilations.getByName("main") {
+            cinterops.create("liquid") {
+                definitionFile.set(project.file("src/nativeInterop/cinterop/liquid_ios.def"))
+                includeDirs(file("prebuilt/ios/include"))
+            }
+        }
+        binaries {
+            framework {
+                baseName = "WhisperDSP"
+            }
+            all {
+                linkerOpts("-L${project.file("prebuilt/ios/lib").absolutePath}", "-lliquid")
+            }
+        }
+    }
+    iosSimulatorArm64 {
+        compilations.getByName("main") {
+            cinterops.create("liquid") {
+                definitionFile.set(project.file("src/nativeInterop/cinterop/liquid_ios.def"))
+                includeDirs(file("prebuilt/ios/include"))
+            }
+        }
+        binaries {
+            framework {
+                baseName = "WhisperDSP"
+            }
+            all {
+                linkerOpts("-L${project.file("prebuilt/ios/lib").absolutePath}", "-lliquid")
+            }
+        }
+    }
 
 //    mingwX64 {
 //        compilations.getByName("main") {
@@ -107,7 +146,7 @@ kotlin {
             }
         }
         
-//        val nativeMain by getting
+        val nativeMain by getting
 
         val desktopMain by getting {
             dependencies {
