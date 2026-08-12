@@ -10,7 +10,7 @@ class NativeSignalGenerator : SignalGenerator {
         val numSamples = (sampleRate * durationMs / 1000.0f).toInt()
         val result = FloatArray(numSamples)
         
-        val nco = nco_crcf_create(liquid_ncotype.LIQUID_NCO)
+        val nco = nco_crcf_create(LIQUID_NCO)
         nco_crcf_set_frequency(nco, (2.0 * PI * frequency / sampleRate).toFloat())
         
         for (i in 0 until numSamples) {
