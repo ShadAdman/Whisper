@@ -7,7 +7,7 @@ on:
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 17
@@ -20,6 +20,37 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Build XCFramework for SPM
+        run: ./gradlew :whisper:assembleWhisperXCFramework
+
+      - name: Zip XCFramework
+        run: |
+          cd whisper/build/XCFrameworks/release
+          zip -r Whisper.xcframework.zip Whisper.xcframework
+
+      - name: Update Package.swift for Remote SPM
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          CHECKSUM=$(swift package compute-checksum whisper/build/XCFrameworks/release/Whisper.xcframework.zip)
+          echo "Computed checksum: $CHECKSUM"
+          
+          # Update URL version and checksum in Package.swift
+          sed -i '' "s|download/.*/Whisper|download/$TAG_NAME/Whisper|g" Package.swift
+          sed -i '' "s|checksum: \".*\"|checksum: \"$CHECKSUM\"|g" Package.swift
+          
+          # Commit changes back to main and update the tag
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add Package.swift
+          git commit -m "Update SPM manifest for $TAG_NAME [skip ci]" || echo "No changes to commit"
+          
+          # Push to main branch
+          git push origin HEAD:main
+          
+          # Force update the tag to include the updated manifest
+          git tag -f $TAG_NAME
+          git push -f origin $TAG_NAME
+
       - name: Publish to Maven Central
         run: ./gradlew publishAndReleaseToMavenCentral --no-configuration-cache
         env:
@@ -28,3 +59,11 @@ jobs:
           ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.GPG_KEY_ID }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_PRIVATE_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_PASSWORD }}
+
+      - name: Upload XCFramework to Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: whisper/build/XCFrameworks/release/Whisper.xcframework.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

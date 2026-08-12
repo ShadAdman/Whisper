@@ -12,7 +12,49 @@ Whisper is a communication protocol designed for decentralized and secure data e
 
 ## Installation
 
-Add the dependency to your Multiplatform project's `commonMain` source set:
+Whisper provides flexible integration options for various platforms. Choose the one that fits your project best.
+
+### Android Integration
+
+Add the dependency to your Android app's `build.gradle` file:
+
+```kotlin
+dependencies {
+    implementation("io.github.shadadman:whisper:0.90.0")
+}
+```
+
+### iOS Integration (Swift Package Manager)
+
+To integrate Whisper into your iOS project using Swift Package Manager, add the following repository URL in Xcode:
+
+`https://github.com/ShadAdman/Whisper`
+
+Whisper provides an XCFramework that includes the core protocol and the [Liquid DSP](https://github.com/jgaeddert/liquid-dsp) engine, optimized for Apple Silicon and Intel-based Macs/iPhones.
+
+### JVM Integration
+
+For desktop or server-side applications, add the JVM-specific dependency:
+
+```kotlin
+dependencies {
+    implementation("io.github.shadadman:whisper-jvm:0.90.0")
+}
+```
+
+Alternatively, you can include the standalone JAR file in your project's `libs` directory.
+
+### Native Integration (C/C++)
+
+For embedded systems or native applications, Whisper can be integrated as a shared or static library. The build process generates:
+- **Headers**: Located in `whisper-dsp/prebuilt/*/include`
+- **Libraries**: Shared libraries (`.so`, `.dylib`) and static libraries (`.a`) in `whisper-dsp/prebuilt/*/lib`
+
+You can link against these libraries in your C/C++ project to leverage the acoustic communication engine directly.
+
+### Kotlin Multiplatform Integration
+
+If you are building a Multiplatform project, add the dependency to your `commonMain` source set:
 
 ```kotlin
 kotlin {
@@ -23,16 +65,6 @@ kotlin {
     }
 }
 ```
-
-Or for Android-only projects:
-
-```kotlin
-dependencies {
-    implementation("io.github.shadadman:whisper:0.90.0")
-}
-```
-
-Support for native iOS projects (Swift Package Manager & CocoaPods) is on the way.
 
 ## Core Concepts
 

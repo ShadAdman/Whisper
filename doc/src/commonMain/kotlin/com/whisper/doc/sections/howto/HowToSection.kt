@@ -24,12 +24,32 @@ fun HowToSection() {
             .padding(32.dp)
     ) {
         Text(
-            text = "Integration Guide",
+            text = "Installation & Integration Guide",
             style = MaterialTheme.typography.displayMedium,
             color = MaterialTheme.colorScheme.primary
         )
 
         Spacer(modifier = Modifier.height(32.dp))
+
+        Text(
+            text = "Platform Specific Installation",
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.secondary
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        PlatformInstallationSection()
+
+        Spacer(modifier = Modifier.height(48.dp))
+
+        Text(
+            text = "Usage Guide",
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.secondary
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         StepCard(
             number = "1",
@@ -100,6 +120,64 @@ fun HowToSection() {
         )
 
         Spacer(modifier = Modifier.height(64.dp))
+    }
+}
+
+@Composable
+fun PlatformInstallationSection() {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        InstallationItem(
+            platform = "Android",
+            description = "Add to your app's build.gradle:",
+            code = "dependencies {\n    implementation(\"io.github.shadadman:whisper:0.90.0\")\n}"
+        )
+        InstallationItem(
+            platform = "iOS",
+            description = "Use Swift Package Manager in Xcode:",
+            code = "Repository URL:\nhttps://github.com/ShadAdman/Whisper"
+        )
+        InstallationItem(
+            platform = "JVM",
+            description = "Add to your desktop or server project:",
+            code = "dependencies {\n    implementation(\"io.github.shadadman:whisper-jvm:0.90.0\")\n}"
+        )
+        InstallationItem(
+            platform = "Native",
+            description = "Link against prebuilt headers and libraries:",
+            code = "// Headers: whisper-dsp/prebuilt/*/include\n// Libs: whisper-dsp/prebuilt/*/lib"
+        )
+        InstallationItem(
+            platform = "Kotlin Multiplatform",
+            description = "Add to your commonMain source set:",
+            code = "kotlin {\n    sourceSets {\n        commonMain.dependencies {\n            implementation(\"io.github.shadadman:whisper:0.90.0\")\n        }\n    }\n}"
+        )
+    }
+}
+
+@Composable
+fun InstallationItem(platform: String, description: String, code: String) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF2C2C2C))
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(platform, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
+            Text(description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(modifier = Modifier.height(8.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Black, RoundedCornerShape(4.dp))
+                    .padding(8.dp)
+            ) {
+                Text(
+                    text = code,
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 12.sp,
+                    color = Color(0xFF81C784)
+                )
+            }
+        }
     }
 }
 
