@@ -32,6 +32,7 @@ kotlin-js-store/
 *.suo
 *.userosscache
 *.sln.docstates
+.artifacts/
 
 # Whisper specific
 /sample/build/

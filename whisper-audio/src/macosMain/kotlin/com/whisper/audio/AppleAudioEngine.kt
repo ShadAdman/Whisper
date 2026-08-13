@@ -5,11 +5,11 @@ class AppleAudioEngine : AudioEngine {
     override val player: AudioPlayer = AppleAudioPlayer()
 
     override suspend fun setup() {
-        // TODO: Configure AVAudioSession (iOS), initialize engine
+        // macOS does not require AVAudioSession setup
     }
 
     override suspend fun release() {
-        // TODO: Release resources
+        // No-op for now
     }
 }
 

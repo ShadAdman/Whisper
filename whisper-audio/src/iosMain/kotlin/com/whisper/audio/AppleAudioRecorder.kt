@@ -5,12 +5,11 @@ import kotlinx.cinterop.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import platform.AVFoundation.*
-import platform.AudioToolbox.*
 import platform.Foundation.*
 
 @OptIn(ExperimentalForeignApi::class)
 class AppleAudioRecorder : AudioRecorder {
-    private val _samples = MutableSharedFlow<AudioFrame>()
+    private val _samples = MutableSharedFlow<AudioFrame>(extraBufferCapacity = 64)
     override val samples: Flow<AudioFrame> = _samples
     
     private val audioEngine = AVAudioEngine()

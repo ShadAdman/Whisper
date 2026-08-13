@@ -1,0 +1,56 @@
+package com.whisper.audio
+
+import com.whisper.core.model.AudioFrame
+import kotlinx.cinterop.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import platform.AVFoundation.*
+import platform.Foundation.*
+
+@OptIn(ExperimentalForeignApi::class)
+class AppleAudioRecorder : AudioRecorder {
+    private val _samples = MutableSharedFlow<AudioFrame>(extraBufferCapacity = 64)
+    override val samples: Flow<AudioFrame> = _samples
+    
+    private val audioEngine = AVAudioEngine()
+
+    override suspend fun start() {
+        val inputNode = audioEngine.inputNode
+        val format = inputNode.inputFormatForBus(0u)
+
+        inputNode.installTapOnBus(0u, 1024u, format) { buffer, _ ->
+            if (buffer != null) {
+                val frameCount = buffer.frameLength.toInt()
+                val channelData = buffer.floatChannelData
+                if (channelData != null) {
+                    val floatData = channelData[0]
+                    if (floatData != null) {
+                        val samples = FloatArray(frameCount)
+                        for (i in 0 until frameCount) {
+                            samples[i] = floatData[i]
+                        }
+                        _samples.tryEmit(
+                            AudioFrame(
+                                samples = samples,
+                                sampleRate = format.sampleRate.toInt(),
+                                channels = format.channelCount.toInt(),
+                                timestamp = (NSDate().timeIntervalSince1970 * 1000).toLong()
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
+        audioEngine.prepare()
+        memScoped {
+            val errorVar = alloc<ObjCObjectVar<NSError?>>()
+            audioEngine.startAndReturnError(errorVar.ptr)
+        }
+    }
+
+    override suspend fun stop() {
+        audioEngine.stop()
+        audioEngine.inputNode.removeTapOnBus(0u)
+    }
+}
