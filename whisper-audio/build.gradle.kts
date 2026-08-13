@@ -42,9 +42,6 @@ kotlin {
                 implementation(libs.kotlinx.datetime)
             }
         }
-        val appleMain by getting {
-            dependsOn(commonMain)
-        }
         val androidMain by getting {
             dependencies {
                 implementation(libs.androidx.startup)
