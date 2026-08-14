@@ -4,7 +4,7 @@ import com.whisper.core.model.AudioFrame
 import kotlinx.cinterop.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import platform.AVFoundation.*
+import platform.AVFAudio.*
 import platform.Foundation.*
 
 @OptIn(ExperimentalForeignApi::class)

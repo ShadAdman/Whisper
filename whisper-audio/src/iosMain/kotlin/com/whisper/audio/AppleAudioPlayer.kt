@@ -2,7 +2,7 @@ package com.whisper.audio
 
 import com.whisper.core.model.AudioFrame
 import kotlinx.cinterop.*
-import platform.AVFoundation.*
+import platform.AVFAudio.*
 import platform.Foundation.*
 
 @OptIn(ExperimentalForeignApi::class)

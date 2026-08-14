@@ -1,7 +1,9 @@
 package com.whisper.audio
 
-import platform.AVFoundation.*
-import platform.Foundation.*
+
+import platform.AVFAudio.AVAudioSession
+import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
+
 import kotlinx.cinterop.*
 
 class AppleAudioEngine : AudioEngine {
