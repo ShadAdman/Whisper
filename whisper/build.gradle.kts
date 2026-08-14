@@ -6,55 +6,60 @@ plugins {
     alias(libs.plugins.vanniktechPublish)
 }
 
+val publishMode = providers.gradleProperty("whisper.publishMode").getOrElse("kmp")
+
 kotlin {
     applyDefaultHierarchyTemplate()
     
-    val xcf = XCFramework("Whisper")
-
     androidLibrary {
         namespace = "com.whisper"
         compileSdk = 34
         minSdk = 29
     }
     
-    jvm("desktop")
+    val jvmTargetName = if (publishMode == "jvm") "jvm" else "desktop"
+    jvm(jvmTargetName)
 
-    linuxX64()
-    
-    macosX64 {
-        binaries.framework {
-            baseName = "Whisper"
-            xcf.add(this)
-            linkerOpts("-L${project(":whisper-dsp").projectDir}/prebuilt/desktop/macos/lib", "-lliquid")
-        }
-    }
-    macosArm64 {
-        binaries.framework {
-            baseName = "Whisper"
-            xcf.add(this)
-            linkerOpts("-L${project(":whisper-dsp").projectDir}/prebuilt/desktop/macos/lib", "-lliquid")
-        }
-    }
+    if (publishMode == "kmp") {
+        val xcf = XCFramework("Whisper")
 
-    iosX64 {
-        binaries.framework {
-            baseName = "Whisper"
-            xcf.add(this)
-            linkerOpts("-L${project(":whisper-dsp").projectDir}/prebuilt/ios/lib", "-lliquid")
+        linuxX64()
+        
+        macosX64 {
+            binaries.framework {
+                baseName = "Whisper"
+                xcf.add(this)
+                linkerOpts("-L${project(":whisper-dsp").projectDir}/prebuilt/desktop/macos/lib", "-lliquid")
+            }
         }
-    }
-    iosArm64 {
-        binaries.framework {
-            baseName = "Whisper"
-            xcf.add(this)
-            linkerOpts("-L${project(":whisper-dsp").projectDir}/prebuilt/ios/lib", "-lliquid")
+        macosArm64 {
+            binaries.framework {
+                baseName = "Whisper"
+                xcf.add(this)
+                linkerOpts("-L${project(":whisper-dsp").projectDir}/prebuilt/desktop/macos/lib", "-lliquid")
+            }
         }
-    }
-    iosSimulatorArm64 {
-        binaries.framework {
-            baseName = "Whisper"
-            xcf.add(this)
-            linkerOpts("-L${project(":whisper-dsp").projectDir}/prebuilt/ios/lib", "-lliquid")
+
+        iosX64 {
+            binaries.framework {
+                baseName = "Whisper"
+                xcf.add(this)
+                linkerOpts("-L${project(":whisper-dsp").projectDir}/prebuilt/ios/lib", "-lliquid")
+            }
+        }
+        iosArm64 {
+            binaries.framework {
+                baseName = "Whisper"
+                xcf.add(this)
+                linkerOpts("-L${project(":whisper-dsp").projectDir}/prebuilt/ios/lib", "-lliquid")
+            }
+        }
+        iosSimulatorArm64 {
+            binaries.framework {
+                baseName = "Whisper"
+                xcf.add(this)
+                linkerOpts("-L${project(":whisper-dsp").projectDir}/prebuilt/ios/lib", "-lliquid")
+            }
         }
     }
     

@@ -16,6 +16,8 @@ plugins {
 }
 
 subprojects {
+    val publishMode = providers.gradleProperty("whisper.publishMode").getOrElse("kmp")
+
     tasks.withType<KotlinCompile>().configureEach {
         kotlinOptions {
             jvmTarget = "17"

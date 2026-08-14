@@ -23,12 +23,19 @@ android {
     }
 }
 
+val publishMode = providers.gradleProperty("whisper.publishMode").getOrElse("kmp")
+
 kotlin {
     applyDefaultHierarchyTemplate()
     
     androidTarget()
     
-    jvm("desktop")
+    val jvmTargetName = if (publishMode == "jvm") "jvm" else "desktop"
+    jvm(jvmTargetName) {
+        compilations.all {
+            kotlinSourceSets.forEach { it.kotlin.srcDir("src/jvmMain/kotlin") }
+        }
+    }
 
     linuxX64 {
         compilations.getByName("main") {
@@ -148,14 +155,13 @@ kotlin {
         
         val nativeMain by getting
 
-        val desktopMain by getting {
-            dependencies {
-                implementation(libs.jna)
-            }
-        }
-
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
+    }
+
+    val jvmSourceSet = if (publishMode == "jvm") "jvmMain" else "desktopMain"
+    sourceSets.getByName(jvmSourceSet).dependencies {
+        implementation(libs.jna)
     }
 }

@@ -15,12 +15,19 @@ android {
     }
 }
 
+val publishMode = providers.gradleProperty("whisper.publishMode").getOrElse("kmp")
+
 kotlin {
     applyDefaultHierarchyTemplate()
     
     androidTarget()
     
-    jvm("desktop")
+    val jvmTargetName = if (publishMode == "jvm") "jvm" else "desktop"
+    jvm(jvmTargetName) {
+        compilations.all {
+            kotlinSourceSets.forEach { it.kotlin.srcDir("src/jvmMain/kotlin") }
+        }
+    }
 
     linuxX64()
     macosX64()
