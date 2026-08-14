@@ -1,4 +1,4 @@
-name: Publish
+name: Publish JVM
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   publish:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 17
@@ -20,8 +20,8 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Publish to Maven Central
-        run: ./gradlew :whisper:publishAndReleaseToMavenCentral -Pwhisper.publishMode=kmp --no-configuration-cache
+      - name: Publish JVM to Maven Central
+        run: ./gradlew :whisper:publishJvmPublicationToMavenCentral -Pwhisper.publishMode=jvm --no-configuration-cache
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
