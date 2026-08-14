@@ -1,12 +1,12 @@
 package com.whisper.audio
 
 
-import platform.AVFAudio.AVAudioSession
-import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
+import platform.AVFoundation.*
+import platform.AVFAudio.*
 import platform.Foundation.*
-
 import kotlinx.cinterop.*
 
+@OptIn(ExperimentalForeignApi::class)
 class AppleAudioEngine : AudioEngine {
     override val recorder: AudioRecorder = AppleAudioRecorder()
     override val player: AudioPlayer = AppleAudioPlayer()
@@ -14,7 +14,7 @@ class AppleAudioEngine : AudioEngine {
     override suspend fun setup() {
         val session = AVAudioSession.sharedInstance()
         memScoped {
-            val errorVar = alloc<ObjCObjectVar<NSError?>>()
+            val errorVar = alloc<ObjCObjectVar<platform.Foundation.NSError?>>()
             session.setCategory(AVAudioSessionCategoryPlayAndRecord, errorVar.ptr)
             session.setActive(true, errorVar.ptr)
         }
@@ -23,7 +23,7 @@ class AppleAudioEngine : AudioEngine {
     override suspend fun release() {
         val session = AVAudioSession.sharedInstance()
         memScoped {
-            val errorVar = alloc<ObjCObjectVar<NSError?>>()
+            val errorVar = alloc<ObjCObjectVar<platform.Foundation.NSError?>>()
             session.setActive(false, errorVar.ptr)
         }
     }
