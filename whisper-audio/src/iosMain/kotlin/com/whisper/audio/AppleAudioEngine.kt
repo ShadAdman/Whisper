@@ -3,6 +3,7 @@ package com.whisper.audio
 
 import platform.AVFAudio.AVAudioSession
 import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
+import platform.Foundation.*
 
 import kotlinx.cinterop.*
 

@@ -29,7 +29,7 @@ class AppleAudioPlayer : AudioPlayer {
         }
 
         val pcmBuffer = AVAudioPCMBuffer(
-            format = format,
+            pCMFormat = format,
             frameCapacity = frame.samples.size.toUInt()
         ) ?: return
         
