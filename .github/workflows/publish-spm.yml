@@ -2,8 +2,8 @@ name: Publish SPM
 
 on:
   push:
-    branches:
-      - 'feat/native-support'
+    tags:
+      - '*'
 
 jobs:
   publish-spm:

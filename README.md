@@ -14,27 +14,43 @@ Whisper is a communication protocol designed for decentralized and secure data e
 
 Whisper provides flexible integration options for various platforms. Choose the one that fits your project best.
 
-### Android Integration
+### Android-only
 
 Add the dependency to your Android app's `build.gradle` file:
 
 ```kotlin
 dependencies {
-    implementation("io.github.shadadman:whisper:0.90.0")
+    implementation("io.github.shadadman:whisper-android:0.90.0")
 }
 ```
+Alternatively, you can build the Android AAR directly from the source.
 
-### iOS Integration (Swift Package Manager)
+Clone the repository:
+
+```
+git clone https://github.com/ShadAdman/Whisper.git
+cd Whisper
+```
+
+Run the Gradle task:
+
+`./gradlew whisper:assembleRelease`
+
+The generated AAR can be found at:
+
+`whisper/build/outputs/aar/`
+
+
+### iOS-only (Swift Package Manager)
 
 To integrate Whisper into your iOS project using Swift Package Manager, add the following repository URL in Xcode:
 
 `https://github.com/ShadAdman/Whisper`
 
-Whisper provides an XCFramework that includes the core protocol and the [Liquid DSP](https://github.com/jgaeddert/liquid-dsp) engine, optimized for Apple Silicon and Intel-based Macs/iPhones.
 
-### JVM Integration
+### JVM-only
 
-For desktop or server-side applications, add the JVM-specific dependency:
+For desktop or jvm applications, add the JVM dependency:
 
 ```kotlin
 dependencies {
@@ -42,19 +58,50 @@ dependencies {
 }
 ```
 
-Alternatively, you can include the standalone JAR file in your project's `libs` directory.
+Alternatively, you can include the standalone JAR file in your project's libs directory.
 
-### Native Integration (C/C++)
+You can also build the JVM JAR directly from the source.
 
-For embedded systems or native applications, Whisper can be integrated as a shared or static library. The build process generates:
-- **Headers**: Located in `whisper-dsp/prebuilt/*/include`
-- **Libraries**: Shared libraries (`.so`, `.dylib`) and static libraries (`.a`) in `whisper-dsp/prebuilt/*/lib`
+Clone the repository:
 
-You can link against these libraries in your C/C++ project to leverage the acoustic communication engine directly.
+```
+git clone https://github.com/ShadAdman/Whisper.git
+cd Whisper
+```
+
+Run the Gradle task:
+
+`./gradlew :whisper:desktopJar`
+
+The generated JAR can be found at:
+
+`whisper/build/libs/`
+
+### Native-only (C/C++)
+
+For native applications or embedded, you can build Whisper directly from the source repository and generate the required native headers and shared/static libraries.
+
+Clone the repository:
+```
+git clone https://github.com/ShadAdman/Whisper.git
+cd Whisper
+```
+
+To generate shared and static binaries use:
+
+`./gradlew :whisper:linkReleaseSharedLinuxX64`
+
+or:
+
+`./gradlew :whisper:linkReleaseStaticLinuxX64`
+
+The generated native binaries are placed under the:
+
+`whisper/build/bin/`
 
 ### Kotlin Multiplatform Integration
 
-If you are building a Multiplatform project, add the dependency to your `commonMain` source set:
+If you are building a Kotlin Multiplatform project, add the dependency to your `commonMain` source set:
 
 ```kotlin
 kotlin {

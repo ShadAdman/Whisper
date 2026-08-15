@@ -38,6 +38,14 @@ fun HowToSection() {
         )
 
         Spacer(modifier = Modifier.height(16.dp))
+        
+        Text(
+            text = "Whisper provides specialized artifacts for projects that don't use Kotlin Multiplatform. These artifacts are smaller, contain only the necessary platform code, and are easier to integrate into native build systems.",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
 
         PlatformInstallationSection()
 
@@ -127,24 +135,31 @@ fun HowToSection() {
 fun PlatformInstallationSection() {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         InstallationItem(
-            platform = "Android",
-            description = "Add to your app's build.gradle:",
-            code = "dependencies {\n    implementation(\"io.github.shadadman:whisper:0.90.0\")\n}"
+            platform = "Android-only",
+            description = "Add dependency to your app's build.gradle or build from source:",
+            code = "dependencies {\n    implementation(\"io.github.shadadman:whisper-android:0.90.0\")\n}\n\n" +
+                   "// Or build AAR from source:\n" +
+                   "./gradlew :whisper:assembleRelease"
         )
         InstallationItem(
-            platform = "iOS",
+            platform = "iOS-only",
             description = "Use Swift Package Manager in Xcode:",
             code = "Repository URL:\nhttps://github.com/ShadAdman/Whisper"
         )
         InstallationItem(
-            platform = "JVM",
-            description = "Add to your desktop or server project:",
-            code = "dependencies {\n    implementation(\"io.github.shadadman:whisper-jvm:0.90.0\")\n}"
+            platform = "JVM-only",
+            description = "Add JVM dependency or build standalone JAR:",
+            code = "dependencies {\n    implementation(\"io.github.shadadman:whisper-jvm:0.90.0\")\n}\n\n" +
+                   "// Or build JAR from source:\n" +
+                   "./gradlew :whisper:desktopJar"
         )
         InstallationItem(
-            platform = "Native",
-            description = "Link against prebuilt headers and libraries:",
-            code = "// Headers: whisper-dsp/prebuilt/*/include\n// Libs: whisper-dsp/prebuilt/*/lib"
+            platform = "Native-only (C/C++)",
+            description = "To generate shared and static binaries use:",
+            code = "./gradlew :whisper:linkReleaseSharedLinuxX64\n" +
+                   "// or\n" +
+                   "./gradlew :whisper:linkReleaseStaticLinuxX64\n\n" +
+                   "// Binaries and headers are placed under whisper/build/bin/"
         )
         InstallationItem(
             platform = "Kotlin Multiplatform",

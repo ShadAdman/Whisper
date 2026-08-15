@@ -1,4 +1,4 @@
-name: Publish-kmp
+name: Publish kmp
 
 on:
   push:
