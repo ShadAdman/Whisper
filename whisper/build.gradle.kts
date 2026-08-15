@@ -44,7 +44,7 @@ kotlin {
             binaries.framework {
                 baseName = "Whisper"
                 xcf.add(this)
-                linkerOpts("-L${project(":whisper-dsp").projectDir}/prebuilt/ios/lib", "-lliquid")
+                linkerOpts("-L${project(":whisper-dsp").projectDir}/prebuilt/ios-simulator/lib", "-lliquid")
             }
         }
         iosArm64 {
@@ -58,7 +58,7 @@ kotlin {
             binaries.framework {
                 baseName = "Whisper"
                 xcf.add(this)
-                linkerOpts("-L${project(":whisper-dsp").projectDir}/prebuilt/ios/lib", "-lliquid")
+                linkerOpts("-L${project(":whisper-dsp").projectDir}/prebuilt/ios-simulator/lib", "-lliquid")
             }
         }
     }

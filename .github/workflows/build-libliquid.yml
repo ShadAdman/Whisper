@@ -2,7 +2,7 @@ name: Build Native DSP
 
 on:
   push:
-    branches: [ build-liquid-dsp ]
+    branches: [ feat/seperate-publish ]
 
   workflow_dispatch:
 
@@ -97,21 +97,45 @@ jobs:
             -DFIND_SIMD=OFF
           cmake --build build_ios --parallel $(sysctl -n hw.ncpu)
 
+      - name: Build for iOS Simulator (arm64, x86_64)
+        run: |
+          mkdir -p build_ios_sim
+          cmake -S whisper-dsp/native/liquid-dsp -B build_ios_sim \
+            -DCMAKE_SYSTEM_NAME=iOS \
+            -DCMAKE_OSX_SYSROOT=iphonesimulator \
+            -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 \
+            -DCMAKE_C_FLAGS="-Wno-error=implicit-function-declaration" \
+            -DBUILD_SHARED_LIBS=ON \
+            -DBUILD_EXAMPLES=OFF \
+            -DBUILD_AUTOTESTS=OFF \
+            -DBUILD_BENCHMARKS=OFF \
+            -DFIND_FFTW=OFF \
+            -DENABLE_SIMD=OFF \
+            -DFIND_SIMD=OFF
+          cmake --build build_ios_sim --parallel $(sysctl -n hw.ncpu)
+
       - name: Prepare Artifacts
         run: |
           mkdir -p whisper-dsp/prebuilt/ios/lib
           mkdir -p whisper-dsp/prebuilt/ios/include
           cp build_ios/libliquid.dylib whisper-dsp/prebuilt/ios/lib/
+          
+          mkdir -p whisper-dsp/prebuilt/ios-simulator/lib
+          mkdir -p whisper-dsp/prebuilt/ios-simulator/include
+          cp build_ios_sim/libliquid.dylib whisper-dsp/prebuilt/ios-simulator/lib/
+          
           cp whisper-dsp/native/liquid-dsp/include/*.h whisper-dsp/prebuilt/ios/include/
+          cp whisper-dsp/native/liquid-dsp/include/*.h whisper-dsp/prebuilt/ios-simulator/include/
 
       - name: Force add artifacts
-        run: git add -f whisper-dsp/prebuilt/ios
+        run: git add -f whisper-dsp/prebuilt/ios whisper-dsp/prebuilt/ios-simulator
 
       - name: Commit and push
         uses: ./.github/actions/commit-and-push
         with:
-          message: Liquid-dsp for iOS
-          add: whisper-dsp/prebuilt/ios
+          message: Liquid-dsp for iOS and iOS Simulator
+          add: whisper-dsp/prebuilt
 
   build-desktop:
     strategy:

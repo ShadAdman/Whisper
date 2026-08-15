@@ -250,13 +250,13 @@ While [Liquid DSP](https://github.com/jgaeddert/liquid-dsp) is a comprehensive l
 - **whisper-audio**: Platform-specific audio recording and playback implementations.
 - **doc**: Documentation and landing page project.
 
-## Requirements
+## Requirements & Supported platforms
 
 - **Android**: API Level 29 or higher.
 - **iOS**: iOS 14.0 or higher.
 - **Desktop**: support for Linux, macOS, and Windows.
 - **Web**: (On the way) support via Kotlin/Wasm.
-- **Native**:(On the way) support for embedded devices.
+- **Native**: support for embedded devices.
 
 ## Troubleshooting & Edge Cases
 

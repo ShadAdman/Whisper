@@ -92,7 +92,7 @@ kotlin {
         compilations.getByName("main") {
             cinterops.create("liquid") {
                 definitionFile.set(project.file("src/nativeInterop/cinterop/liquid_ios.def"))
-                includeDirs(file("prebuilt/ios/include"))
+                includeDirs(file("prebuilt/ios-simulator/include"))
             }
         }
         binaries {
@@ -100,7 +100,7 @@ kotlin {
                 baseName = "WhisperDSP"
             }
             all {
-                linkerOpts("-L${project.file("prebuilt/ios/lib").absolutePath}", "-lliquid")
+                linkerOpts("-L${project.file("prebuilt/ios-simulator/lib").absolutePath}", "-lliquid")
             }
         }
     }
@@ -124,7 +124,7 @@ kotlin {
         compilations.getByName("main") {
             cinterops.create("liquid") {
                 definitionFile.set(project.file("src/nativeInterop/cinterop/liquid_ios.def"))
-                includeDirs(file("prebuilt/ios/include"))
+                includeDirs(file("prebuilt/ios-simulator/include"))
             }
         }
         binaries {
@@ -132,7 +132,7 @@ kotlin {
                 baseName = "WhisperDSP"
             }
             all {
-                linkerOpts("-L${project.file("prebuilt/ios/lib").absolutePath}", "-lliquid")
+                linkerOpts("-L${project.file("prebuilt/ios-simulator/lib").absolutePath}", "-lliquid")
             }
         }
     }
