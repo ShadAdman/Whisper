@@ -151,7 +151,12 @@ jobs:
         shell: bash
         run: |
             mkdir -p build_desktop
+            CMAKE_FLAGS=""
+            if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+              CMAKE_FLAGS="-DCMAKE_OSX_ARCHITECTURES='arm64;x86_64'"
+            fi
             cmake -S whisper-dsp/native/liquid-dsp -B build_desktop \
+              $CMAKE_FLAGS \
               -DBUILD_SHARED_LIBS=ON \
               -DBUILD_EXAMPLES=OFF \
               -DBUILD_AUTOTESTS=OFF \
