@@ -29,7 +29,18 @@ kotlin {
         }
     }
 
-    linuxX64()
+    linuxX64 {
+        compilations.getByName("main") {
+            cinterops {
+                val libcrypto by creating
+            }
+        }
+        binaries {
+            all {
+                linkerOpts("-L/usr/lib/x86_64-linux-gnu", "-lcrypto")
+            }
+        }
+    }
     macosX64()
     macosArm64()
 

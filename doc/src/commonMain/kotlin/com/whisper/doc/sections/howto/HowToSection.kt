@@ -156,8 +156,8 @@ fun PlatformInstallationSection() {
         InstallationItem(
             platform = "Native-only (C/C++)",
             description = "To generate shared and static binaries use:",
-            code = "// NOTE: Building for Linux requires libasound2-dev\n" +
-                   "// sudo apt-get install libasound2-dev\n\n" +
+            code = "// NOTE: Building for Linux requires libasound2-dev and libssl-dev\n" +
+                   "// sudo apt-get install libasound2-dev libssl-dev\n\n" +
                    "./gradlew :whisper:linkReleaseSharedLinuxX64\n" +
                    "// or\n" +
                    "./gradlew :whisper:linkReleaseStaticLinuxX64\n\n" +

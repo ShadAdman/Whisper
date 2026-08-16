@@ -1,0 +1,5 @@
+package = openssl
+headers = openssl/evp.h openssl/rand.h openssl/err.h
+headerFilter = openssl/**
+compilerOpts.linux = -I/usr/include -I/usr/include/x86_64-linux-gnu
+linkerOpts.linux = -lcrypto
