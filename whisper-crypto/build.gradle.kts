@@ -32,7 +32,9 @@ kotlin {
     linuxX64 {
         compilations.getByName("main") {
             cinterops {
-                val libcrypto by creating
+                val libcrypto by creating {
+                    includeDirs("/usr/include", "/usr/include/openssl", "/usr/include/x86_64-linux-gnu")
+                }
             }
         }
         binaries {

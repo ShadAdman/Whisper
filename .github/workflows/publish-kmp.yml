@@ -24,7 +24,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libasound2-dev libssl-dev
+          sudo apt-get install -y libasound2-dev libssl-dev gcc-multilib
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew

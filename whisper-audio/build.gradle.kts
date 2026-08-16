@@ -35,7 +35,7 @@ kotlin {
         compilations.getByName("main") {
             cinterops {
                 val alsa by creating {
-                    includeDirs("/usr/include", "/usr/include/alsa")
+                    includeDirs("/usr/include", "/usr/include/alsa", "/usr/include/x86_64-linux-gnu")
                 }
             }
         }
