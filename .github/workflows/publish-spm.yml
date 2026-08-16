@@ -58,7 +58,7 @@ jobs:
           git commit -m "Update SPM manifest for $TAG_NAME [skip ci]" || echo "No changes to commit"
           
           # Push to main branch using PAT for workflow permissions
-          git push https://x-access-token:${{ secrets.WORK_FLOW_PAT }}@github.com/${{ github.repository }}.git HEAD:main
+          git push -f https://x-access-token:${{ secrets.WORK_FLOW_PAT }}@github.com/${{ github.repository }}.git HEAD:main
           
           # Force update the tag to include the updated manifest
           git tag -f $TAG_NAME
