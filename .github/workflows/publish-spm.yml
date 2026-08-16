@@ -16,6 +16,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Essential for git push and tag updates
+          token: ${{ secrets.WORK_FLOW_PAT }}
 
       - name: Set up JDK 17
         uses: actions/setup-java@v5
@@ -56,12 +57,12 @@ jobs:
           git add Package.swift
           git commit -m "Update SPM manifest for $TAG_NAME [skip ci]" || echo "No changes to commit"
           
-          # Push to main branch
-          git push origin HEAD:main
+          # Push to main branch using PAT for workflow permissions
+          git push https://x-access-token:${{ secrets.WORK_FLOW_PAT }}@github.com/${{ github.repository }}.git HEAD:main
           
           # Force update the tag to include the updated manifest
           git tag -f $TAG_NAME
-          git push -f origin $TAG_NAME
+          git push -f https://x-access-token:${{ secrets.WORK_FLOW_PAT }}@github.com/${{ github.repository }}.git $TAG_NAME
 
       - name: Upload XCFramework to Release
         uses: softprops/action-gh-release@v1
