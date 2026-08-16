@@ -1,0 +1,5 @@
+headers = alsa/asoundlib.h
+headerFilter = alsa/**
+package = alsa
+pkg-config = alsa
+linkerOpts.linux = -lasound

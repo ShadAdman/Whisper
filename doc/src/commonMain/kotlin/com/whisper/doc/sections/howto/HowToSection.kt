@@ -156,7 +156,9 @@ fun PlatformInstallationSection() {
         InstallationItem(
             platform = "Native-only (C/C++)",
             description = "To generate shared and static binaries use:",
-            code = "./gradlew :whisper:linkReleaseSharedLinuxX64\n" +
+            code = "// NOTE: Building for Linux requires libasound2-dev\n" +
+                   "// sudo apt-get install libasound2-dev\n\n" +
+                   "./gradlew :whisper:linkReleaseSharedLinuxX64\n" +
                    "// or\n" +
                    "./gradlew :whisper:linkReleaseStaticLinuxX64\n\n" +
                    "// Binaries and headers are placed under whisper/build/bin/"

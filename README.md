@@ -81,6 +81,10 @@ The generated JAR can be found at:
 
 For native applications or embedded, you can build Whisper directly from the source repository and generate the required native headers and shared/static libraries.
 
+> [!IMPORTANT]
+> **Linux Build Requirement**: To build for Linux targets, you must have the ALSA development headers installed on your system.
+> On Ubuntu/Debian, run: `sudo apt-get install libasound2-dev`
+
 Clone the repository:
 ```
 git clone https://github.com/ShadAdman/Whisper.git

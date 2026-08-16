@@ -31,7 +31,15 @@ kotlin {
         }
     }
 
-    linuxX64()
+    linuxX64 {
+        compilations.getByName("main") {
+            cinterops {
+                val alsa by creating {
+                    includeDirs("/usr/include", "/usr/include/alsa")
+                }
+            }
+        }
+    }
     macosX64()
     macosArm64()
     iosX64()
