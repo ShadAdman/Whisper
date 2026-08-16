@@ -262,7 +262,22 @@ While [Liquid DSP](https://github.com/jgaeddert/liquid-dsp) is a comprehensive l
 - **Web**: (On the way) support via Kotlin/Wasm.
 - **Native**: support for embedded devices.
 
-## Troubleshooting & Edge Cases
+## Where to?
+
+Whisper isn't a replacement for Wi-Fi or Bluetooth; it's a specialized tool for specific environments where radio waves are impractical, unavailable, or insecure.
+
+### Best Use Cases
+- **Air-Gapped Sync**: Synchronize configuration or small files between devices in EMI-sensitive or high-security zones where RF is banned.
+- **Initial Handshake**: Exchange Wi-Fi or Bluetooth credentials automatically by simply being in the same room, eliminating manual pairing.
+- **Museum Guides**: Trigger location-specific audio or descriptions on a visitor's phone using ambient ultrasound emitters near exhibits.
+- **Presence Proof**: Verify that a user is physically present at a location (like a check-in desk) without relying on spoofable GPS data.
+
+### Software & App Ideas
+- **WhisperGate**: A contactless entry system for offices or secure zones using standard phone speakers to transmit encrypted acoustic tokens.
+- **SoundPay**: Offline micro-transactions in remote areas. Customers can pay by exchanging confirmation tokens via ultrasound even with zero cellular coverage.
+- **EchoPass**: A proximity-based password manager that auto-fills credentials only when it "hears" your authorized mobile device nearby.
+
+## What if?
 
 ### What if there is loud background noise?
 Whisper uses a bandpass filter to ignore frequencies outside the 18-22 kHz range. Most environmental noise (talking, music, traffic) is below 15 kHz. However, extremely loud metallic noises or specialized ultrasound jammers can cause interference. In these cases, increasing the FEC redundancy is recommended.
@@ -282,7 +297,7 @@ Multipath interference is a common challenge in acoustic communication. Whisper'
 ### What if a user has pet?
 Pets such as dogs or cats can hear high-frequency sounds. While Whisper operates near the edge of human hearing, animals might hear a very faint 'whistle' or 'static'. We recommend providing a toggle in your app to disable acoustic features for accessibility.
 
-## Security
+## How about Security?
 
 Whisper provides built-in support for securing data payloads via the `whisper-crypto` module. By default, it supports:
 - **AES (CBC with PKCS7 Padding)**: Uses platform-native hardware acceleration via `AesEncryptor()`.

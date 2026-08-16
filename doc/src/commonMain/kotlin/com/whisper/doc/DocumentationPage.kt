@@ -17,10 +17,12 @@ import androidx.compose.ui.unit.sp
 import com.whisper.doc.sections.howto.HowToSection
 import com.whisper.doc.sections.whatif.WhatIfSection
 import com.whisper.doc.sections.whatis.WhatIsSection
+import com.whisper.doc.sections.whereto.WhereToSection
 
 sealed class DocSection(val title: String) {
     object WhatIs : DocSection("What is?")
     object HowTo : DocSection("How To?")
+    object WhereTo : DocSection("Where to?")
     object WhatIf : DocSection("What If?")
 }
 
@@ -49,7 +51,8 @@ fun DocumentationPage(onBack: () -> Unit) {
                         selectedTabIndex = when(selectedSection) {
                             DocSection.WhatIs -> 0
                             DocSection.HowTo -> 1
-                            DocSection.WhatIf -> 2
+                            DocSection.WhereTo -> 2
+                            DocSection.WhatIf -> 3
                         },
                         containerColor = Color.Transparent,
                         contentColor = MaterialTheme.colorScheme.primary,
@@ -65,6 +68,11 @@ fun DocumentationPage(onBack: () -> Unit) {
                             selected = selectedSection == DocSection.HowTo,
                             onClick = { selectedSection = DocSection.HowTo },
                             text = { Text("How To?") }
+                        )
+                        Tab(
+                            selected = selectedSection == DocSection.WhereTo,
+                            onClick = { selectedSection = DocSection.WhereTo },
+                            text = { Text("Where to?") }
                         )
                         Tab(
                             selected = selectedSection == DocSection.WhatIf,
@@ -105,6 +113,7 @@ fun DocumentationPage(onBack: () -> Unit) {
                     
                     DocSidebarItem(DocSection.WhatIs, selectedSection) { selectedSection = it }
                     DocSidebarItem(DocSection.HowTo, selectedSection) { selectedSection = it }
+                    DocSidebarItem(DocSection.WhereTo, selectedSection) { selectedSection = it }
                     DocSidebarItem(DocSection.WhatIf, selectedSection) { selectedSection = it }
                 }
 
@@ -122,6 +131,7 @@ fun DocContent(section: DocSection) {
     when (section) {
         DocSection.WhatIs -> WhatIsSection()
         DocSection.HowTo -> HowToSection()
+        DocSection.WhereTo -> WhereToSection()
         DocSection.WhatIf -> WhatIfSection()
     }
 }
