@@ -31,20 +31,29 @@ kotlin {
         }
     }
 
-    linuxX64 {
-        compilations.getByName("main") {
-            cinterops {
-                val alsa by creating {
-                    includeDirs("/usr/include", "/usr/include/alsa", "/usr/include/x86_64-linux-gnu")
+    val hostOs = System.getProperty("os.name")
+    val isLinux = hostOs == "Linux"
+    val isMac = hostOs == "Mac OS X"
+
+    if (isLinux) {
+        linuxX64 {
+            compilations.getByName("main") {
+                cinterops {
+                    val alsa by creating {
+                        includeDirs("/usr/include", "/usr/include/alsa", "/usr/include/x86_64-linux-gnu")
+                    }
                 }
             }
         }
     }
-    macosX64()
-    macosArm64()
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
+
+    if (isMac) {
+        macosX64()
+        macosArm64()
+        iosX64()
+        iosArm64()
+        iosSimulatorArm64()
+    }
 
     sourceSets {
         all {
