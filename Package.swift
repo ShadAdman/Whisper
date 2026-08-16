@@ -15,7 +15,7 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "Whisper",
-            url: "https://github.com/ShadAdman/Whisper/releases/download/2.40.30/Whisper.xcframework.zip",
-            checksum: "de0dbbab1e965c36f771aa57c547da72fe58f7840bc37fa8c208f5c35342a70e")
+            url: "https://github.com/ShadAdman/Whisper/releases/download/2.40.60/Whisper.xcframework.zip",
+            checksum: "787703d10ce9454d5d3adbbed7dc58958c00b58ddd8a6f6ca5cf8c579fd0ae6e")
     ]
 )
