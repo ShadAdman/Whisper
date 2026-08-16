@@ -20,45 +20,53 @@ kotlin {
     val jvmTargetName = if (publishMode == "jvm") "jvm" else "desktop"
     jvm(jvmTargetName)
 
+    val hostOs = System.getProperty("os.name")
+    val isLinux = hostOs == "Linux"
+    val isMac = hostOs == "Mac OS X"
+
     if (publishMode == "kmp") {
         val xcf = XCFramework("Whisper")
 
-        linuxX64()
-        
-        macosX64 {
-            binaries.framework {
-                baseName = "Whisper"
-                xcf.add(this)
-                linkerOpts("-L${project(":whisper-dsp").projectDir}/prebuilt/desktop/macos/lib", "-lliquid")
-            }
-        }
-        macosArm64 {
-            binaries.framework {
-                baseName = "Whisper"
-                xcf.add(this)
-                linkerOpts("-L${project(":whisper-dsp").projectDir}/prebuilt/desktop/macos/lib", "-lliquid")
-            }
+        if (isLinux) {
+            linuxX64()
         }
 
-        iosX64 {
-            binaries.framework {
-                baseName = "Whisper"
-                xcf.add(this)
-                linkerOpts("-L${project(":whisper-dsp").projectDir}/prebuilt/ios-simulator/lib", "-lliquid")
+        if (isMac) {
+            macosX64 {
+                binaries.framework {
+                    baseName = "Whisper"
+                    xcf.add(this)
+                    linkerOpts("-L${project(":whisper-dsp").projectDir}/prebuilt/desktop/macos/lib", "-lliquid")
+                }
             }
-        }
-        iosArm64 {
-            binaries.framework {
-                baseName = "Whisper"
-                xcf.add(this)
-                linkerOpts("-L${project(":whisper-dsp").projectDir}/prebuilt/ios/lib", "-lliquid")
+            macosArm64 {
+                binaries.framework {
+                    baseName = "Whisper"
+                    xcf.add(this)
+                    linkerOpts("-L${project(":whisper-dsp").projectDir}/prebuilt/desktop/macos/lib", "-lliquid")
+                }
             }
-        }
-        iosSimulatorArm64 {
-            binaries.framework {
-                baseName = "Whisper"
-                xcf.add(this)
-                linkerOpts("-L${project(":whisper-dsp").projectDir}/prebuilt/ios-simulator/lib", "-lliquid")
+
+            iosX64 {
+                binaries.framework {
+                    baseName = "Whisper"
+                    xcf.add(this)
+                    linkerOpts("-L${project(":whisper-dsp").projectDir}/prebuilt/ios-simulator/lib", "-lliquid")
+                }
+            }
+            iosArm64 {
+                binaries.framework {
+                    baseName = "Whisper"
+                    xcf.add(this)
+                    linkerOpts("-L${project(":whisper-dsp").projectDir}/prebuilt/ios/lib", "-lliquid")
+                }
+            }
+            iosSimulatorArm64 {
+                binaries.framework {
+                    baseName = "Whisper"
+                    xcf.add(this)
+                    linkerOpts("-L${project(":whisper-dsp").projectDir}/prebuilt/ios-simulator/lib", "-lliquid")
+                }
             }
         }
     }

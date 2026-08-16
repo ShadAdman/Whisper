@@ -29,13 +29,22 @@ kotlin {
         }
     }
 
-    linuxX64()
-    macosX64()
-    macosArm64()
+    val hostOs = System.getProperty("os.name")
+    val isLinux = hostOs == "Linux"
+    val isMac = hostOs == "Mac OS X"
 
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
+    if (isLinux) {
+        linuxX64()
+    }
+
+    if (isMac) {
+        macosX64()
+        macosArm64()
+
+        iosX64()
+        iosArm64()
+        iosSimulatorArm64()
+    }
     
 //    mingwX64()
 
