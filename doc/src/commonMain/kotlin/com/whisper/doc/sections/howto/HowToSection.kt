@@ -62,10 +62,11 @@ fun HowToSection() {
         StepCard(
             number = "1",
             title = "Initialization",
-            description = "The first step is to configure the Whisper engine. You can adjust the sample rate and carrier frequencies to match your environment's acoustic properties.",
+            description = "The first step is to configure the Whisper engine. You can adjust the sample rate, carrier frequencies, and the transmission protocol (e.g., FSK or Morse).",
             code = "val config = WhisperConfig(\n" +
                    "    sampleRate = 48000,\n" +
                    "    carrierFrequency = 19000f,\n" +
+                   "    protocolType = ProtocolType.MORSE,\n" +
                    "    fecConfig = FecConfig(enabled = true, redundancy = 2)\n" +
                    ")\n\n" +
                    "Whisper.configure(config)"

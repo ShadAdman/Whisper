@@ -37,6 +37,11 @@ fun WhatIfSection() {
         )
 
         QAItem(
+            question = "What if I want to use Morse Code?",
+            answer = "Morse code is an alternative protocol for high-reliability communication. However, it is significantly slower than FSK. Because binary data is converted to Hexadecimal strings before transmission, it should only be used for small, non-time-critical payloads or in environments with extreme acoustic interference."
+        )
+
+        QAItem(
             question = "What if I want to send large files?",
             answer = "Whisper is optimized for low-bandwidth, high-reliability data like text, authentication tokens, or peer discovery info. Sending large files (megabytes) via sound is slow (approx. 100-500 bps). For large data, we recommend using Whisper to exchange Wi-Fi Direct or Bluetooth credentials, then switching to those high-speed channels."
         )
