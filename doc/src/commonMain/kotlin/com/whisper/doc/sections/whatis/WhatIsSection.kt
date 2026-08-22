@@ -70,7 +70,17 @@ fun WhatIsSection() {
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        SectionHeader("3. The DSP Pipeline")
+        SectionHeader("3. Morse Code Protocol")
+        Text(
+            text = "Whisper includes an optional Morse code protocol for low-bandwidth, high-reliability scenarios. Since Morse code is inherently text-based, binary data is converted to a Hexadecimal string before transmission. While slower than FSK, Morse code can be easier to integrate with legacy equipment or for use in extremely noisy environments.",
+            style = MaterialTheme.typography.bodyMedium,
+            fontSize = 18.sp,
+            lineHeight = 28.sp
+        )
+
+        Spacer(modifier = Modifier.height(48.dp))
+
+        SectionHeader("4. The DSP Pipeline")
         Text(
             text = "Acoustic signals are prone to interference. Our Digital Signal Processing (DSP) pipeline handles:\n\n" +
                  "• Windowing: Segmenting audio for FFT analysis.\n" +
@@ -83,7 +93,7 @@ fun WhatIsSection() {
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        SectionHeader("4. Powered by Liquid DSP")
+        SectionHeader("5. Powered by Liquid DSP")
         Text(
             text = "Whisper's engine is built upon Liquid DSP (github.com/jgaeddert/liquid-dsp), a powerful, open-source software-defined radio library. While it is a comprehensive suite, we chose it specifically for its performance and future-readiness. Using Liquid DSP allows Whisper to:\n\n" +
                  "• Leverage Industrial-Grade Filters: Achieving sharp frequency separation that keeps the signal clear in noisy environments.\n" +
@@ -96,7 +106,7 @@ fun WhatIsSection() {
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        SectionHeader("5. Reliability & FEC")
+        SectionHeader("6. Reliability & FEC")
         Text(
             text = "Sound reflects off walls and is absorbed by objects. Whisper uses Forward Error Correction (FEC) to ensure data integrity. By adding mathematical redundancy, the receiver can reconstruct the original message even if parts of the sound signal were corrupted by a loud noise.",
             style = MaterialTheme.typography.bodyMedium,
@@ -106,7 +116,7 @@ fun WhatIsSection() {
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        SectionHeader("6. Secure Payload")
+        SectionHeader("7. Secure Payload")
         Text(
             text = "Whisper includes a built-in cryptographic layer through the whisper-crypto module. It provides platform-native AES encryption to ensure that even if someone records the acoustic signal, they cannot access the underlying data without the secret key.",
             style = MaterialTheme.typography.bodyMedium,

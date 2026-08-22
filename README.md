@@ -127,6 +127,12 @@ Acoustic communication uses sound waves to transmit information. Whisper operate
 ### FSK Modulation
 Whisper uses Frequency Shift Keying (FSK) to represent data. In FSK, different frequencies are assigned to represent specific bit values. For example, one frequency might represent a binary 0, while another represents a binary 1. By switching between these frequencies over time, the protocol can encode a stream of data into a sound signal.
 
+### Morse Code Protocol
+Whisper includes an optional Morse Code transmission protocol. This is particularly useful for very low-bandwidth, high-reliability scenarios or for integration with legacy systems. 
+
+> [!NOTE]
+> **Data Encoding**: Since Morse code is traditionally text-based, Whisper converts binary data into a **Hexadecimal string** before Morse encoding it. For example, the byte `0x41` is represented as the string "41", which is then translated into Morse signals (`....-` and `.----`).
+
 ### DSP Pipeline (Powered by [Liquid DSP](https://github.com/jgaeddert/liquid-dsp))
 Digital Signal Processing (DSP) is used to clean and prepare the audio signal before it is analyzed. Whisper leverages **[Liquid DSP](https://github.com/jgaeddert/liquid-dsp)**, a comprehensive and highly optimized software-defined radio (SDR) library. This allows us to employ a sophisticated pipeline that includes:
 - **Windowing**: Breaking the continuous audio stream into manageable segments for analysis.
@@ -152,7 +158,8 @@ val config = WhisperConfig(
     carrierFrequency = 19000f,
     fecConfig = FecConfig(enabled = true, redundancy = 2),
     encryptionKey = "your-16-byte-key".encodeToByteArray(),
-    encryptor = AesEncryptor()
+    encryptor = AesEncryptor(),
+    protocolType = ProtocolType.MORSE
 )
 
 Whisper.configure(config)
@@ -162,6 +169,9 @@ The `WhisperConfig` class accepts the following parameters:
 
 - **sampleRate**: The audio sampling rate in Hz. A value of 48000 Hz is recommended for most modern devices to ensure high-fidelity signal processing.
 - **carrierFrequency**: The central frequency used for the acoustic signal, measured in Hz. By default, this is set to 19000 Hz, which resides in the near-ultrasound spectrum. This allows for communication that is typically inaudible to humans but recognizable by standard microphones.
+- **protocolType**: Defines the transmission protocol to be used. Options include:
+    - `ProtocolType.DEFAULT`: Uses high-speed FSK modulation (recommended for most use cases).
+    - `ProtocolType.MORSE`: Uses Morse code encoding. Note that this is significantly slower and should only be used for small, non-time-sensitive payloads.
 - **fecConfig**: This parameter handles the Forward Error Correction settings through the `FecConfig` class:
     - **enabled**: A boolean that determines whether error correction logic should be applied to the transmitted data.
     - **redundancy**: An integer that defines the level of data duplication. A higher value improves the chances of successful data recovery in environments with significant background noise, though it will increase the total time required for transmission.
@@ -284,6 +294,11 @@ Whisper uses a bandpass filter to ignore frequencies outside the 18-22 kHz range
 
 ### What if the devices are too far apart?
 The effective range of Whisper is typically 1-5 meters depending on the speaker volume and microphone sensitivity. Sound follows the inverse square law, so signal strength drops rapidly with distance. If you need more range, you should lower the carrier frequency (closer to 17 kHz) or increase the transmission volume.
+
+### What if I want to use Morse Code?
+Morse code is available as an alternative protocol for highly reliable, low-bandwidth communication. 
+> [!CAUTION]
+> **Performance Impact**: Morse code is significantly slower than the default FSK protocol. Because binary data is encoded as Hexadecimal strings first, the transmission overhead is high. We recommend using Morse code only for short strings (e.g., "OK", "FAIL", or small status codes) or in extreme noise conditions where FSK might struggle.
 
 ### What if I want to send large files?
 Whisper is optimized for low-bandwidth, high-reliability data like text, authentication tokens, or peer discovery info. Sending large files (megabytes) via sound is slow (approx. 100-500 bps). For large data, we recommend using Whisper to exchange Wi-Fi Direct or Bluetooth credentials, then switching to those high-speed channels.
