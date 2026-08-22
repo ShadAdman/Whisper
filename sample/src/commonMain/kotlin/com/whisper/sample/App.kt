@@ -5,11 +5,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.whisper.api.Whisper
 import com.whisper.config.WhisperConfig
 import com.whisper.core.error.FecConfig
+import com.whisper.core.protocol.ProtocolType
 import com.whisper.core.model.CarrierDetected
 import com.whisper.core.model.CarrierLost
 import com.whisper.core.model.FrequencyDetection
@@ -34,10 +36,16 @@ fun App() {
     
     var isFecEnabled by remember { mutableStateOf(true) }
     var redundancy by remember { mutableStateOf(3) }
+    var selectedProtocol by remember { mutableStateOf(ProtocolType.DEFAULT) }
     
 
-    LaunchedEffect(isFecEnabled, redundancy) {
-        Whisper.configure(WhisperConfig(fecConfig = FecConfig(enabled = isFecEnabled, redundancy = redundancy)))
+    LaunchedEffect(isFecEnabled, redundancy, selectedProtocol) {
+        Whisper.configure(
+            WhisperConfig(
+                fecConfig = FecConfig(enabled = isFecEnabled, redundancy = redundancy),
+                protocolType = selectedProtocol
+            )
+        )
     }
 
     LaunchedEffect(isListening) {
@@ -116,6 +124,21 @@ fun App() {
                                 modifier = Modifier.padding(horizontal = 16.dp)
                             )
                         }
+                    }
+                    Divider()
+                    Text("Protocol:", style = MaterialTheme.typography.subtitle1)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(
+                            selected = selectedProtocol == ProtocolType.DEFAULT,
+                            onClick = { selectedProtocol = ProtocolType.DEFAULT }
+                        )
+                        Text("Default (FSK)")
+                        Spacer(Modifier.width(16.dp))
+                        RadioButton(
+                            selected = selectedProtocol == ProtocolType.MORSE,
+                            onClick = { selectedProtocol = ProtocolType.MORSE }
+                        )
+                        Text("Morse Code")
                     }
                 }
             }
